@@ -1,0 +1,32 @@
+name: silhouette_quiz
+description: "Silhouette quiz for kids."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.9.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ローカライズ（GlobalMaterialLocalizations など）
+  flutter_localizations:
+    sdk: flutter
+
+  # iOS っぽいアイコン
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  # あとで画像などを追加する場合はここに書く
+  # assets:
+  #   - assets/images/
