@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
@@ -49,7 +51,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
         appBar: AppBar(
           title: Text(l10n.playQuizTitle),
         ),
-        body: Center(
+        body: const Center(
           child: Text('クイズが みつかりません'),
         ),
       );
@@ -67,7 +69,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // 何問目か軽く表示
+              // 何問目か
               Text(
                 '${_currentIndex + 1} / ${quizSet.questions.length}',
                 style: const TextStyle(
@@ -79,23 +81,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
                 child: Center(
                   child: AspectRatio(
                     aspectRatio: 1,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        // 本来はシルエット画像を描画する。
-                        // 今はダミーとして色付きコンテナ。
-                        color: silhouetteService.randomSilhouetteColor(),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'シルエット ${_currentIndex + 1}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                          ),
-                        ),
-                      ),
-                    ),
+                    child: _buildQuestionVisual(question),
                   ),
                 ),
               ),
@@ -110,9 +96,13 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(question.answerText ?? ''),
+                    // デフォルトクイズには answerText が入っている想定
+                    // 自作クイズはとりあえず「（こたえは じぶんたちで おはなし）」などでもOK
+                    Text(
+                      question.answerText ?? 'こたえは じぶんたちで おはなししてね！',
+                    ),
                     const SizedBox(height: 16),
-                    // ここでセルフ○×ボタン
+                    // セルフ○×ボタン
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -143,7 +133,6 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
                         : () {
                             setState(() {
                               _showAnswer = true;
-                              // まだ回答はしていない
                               _hasAnsweredCurrent = false;
                             });
                           },
@@ -169,6 +158,53 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
                 ],
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// シルエット表示（MVP版）
+  /// - 自作クイズ: 撮った写真を黒っぽくフィルタして「なんとなくシルエット」にする
+  /// - デフォルトクイズ: これまでのカラフルダミーを継続
+  Widget _buildQuestionVisual(QuizQuestion question) {
+    final String? path = question.silhouetteImagePath.isNotEmpty
+        ? question.silhouetteImagePath
+        : question.originalImagePath;
+
+    final bool hasFile =
+        path != null && path.isNotEmpty && File(path).existsSync();
+
+    if (hasFile) {
+      final File file = File(path!);
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: ColorFiltered(
+          // 真っ黒ではないけど、暗めでシルエットっぽく見せる
+          colorFilter: const ColorFilter.mode(
+            Colors.black54,
+            BlendMode.darken,
+          ),
+          child: Image.file(
+            file,
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    }
+
+    // デフォルトクイズ用（画像がない場合）
+    return Container(
+      decoration: BoxDecoration(
+        color: silhouetteService.randomSilhouetteColor(),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(
+        child: Text(
+          'シルエット ${_currentIndex + 1}',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
           ),
         ),
       ),

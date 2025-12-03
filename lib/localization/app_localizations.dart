@@ -45,7 +45,7 @@ class AppLocalizations {
           'しゃしんをとって じぶんだけの シルエットクイズを つくろう！\nさいだい 10まい まで とれるよ。',
       'create_intro_start_button': 'はじめる',
       'create_capture_title': 'しゃしんをとる',
-      'create_capture_add_dummy': 'ダミーしゃしんを 1まい ふやす',
+      'create_capture_add_dummy': 'しゃしんを 1まい とる',
       'create_capture_count': 'いま {count} まい',
       'create_capture_finish': 'かんりょう',
       'create_capture_limit_message': 'これいじょう は とれません（10まい まで）',

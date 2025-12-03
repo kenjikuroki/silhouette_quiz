@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../localization/app_localizations.dart';
 import '../models/quiz_models.dart';
@@ -26,6 +29,8 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
 
   final List<QuizQuestion> _tempQuestions = <QuizQuestion>[];
 
+  final ImagePicker _picker = ImagePicker();
+
   QuizAppState get appState => widget.appState;
 
   @override
@@ -50,8 +55,16 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                     final QuizQuestion question = _tempQuestions[index];
                     return Card(
                       child: ListTile(
+                        leading: (question.originalImagePath != null &&
+                                File(question.originalImagePath!).existsSync())
+                            ? Image.file(
+                                File(question.originalImagePath!),
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.cover,
+                              )
+                            : const Icon(Icons.photo),
                         title: Text('もんだい ${index + 1}'),
-                        subtitle: Text(question.answerText ?? ''),
                       ),
                     );
                   },
@@ -61,13 +74,7 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
               ElevatedButton(
                 onPressed: _tempQuestions.length >= maxImages
                     ? null
-                    : () {
-                        setState(() {
-                          final QuizQuestion q =
-                              appState.silhouetteService.createDummyQuestion();
-                          _tempQuestions.add(q);
-                        });
-                      },
+                    : _captureImageFromCamera,
                 child: Text(l10n.createCaptureAddDummy),
               ),
               const SizedBox(height: 8),
@@ -99,5 +106,33 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _captureImageFromCamera() async {
+    final XFile? picked = await _picker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 1024,
+      maxHeight: 1024,
+    );
+
+    if (picked == null) {
+      // キャンセルされた
+      return;
+    }
+
+    final String path = picked.path;
+
+    final QuizQuestion question = QuizQuestion(
+      id:
+          'custom_${DateTime.now().microsecondsSinceEpoch}_${_tempQuestions.length}',
+      // ★ MVP ではひとまず元画像のパスを両方に入れておく
+      silhouetteImagePath: path,
+      originalImagePath: path,
+      answerText: null,
+    );
+
+    setState(() {
+      _tempQuestions.add(question);
+    });
   }
 }

@@ -18,6 +18,9 @@ dependencies:
   # iOS っぽいアイコン
   cupertino_icons: ^1.0.8
 
+  # ★ 追加：カメラ・ギャラリーから画像を取る
+  image_picker: ^1.0.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
