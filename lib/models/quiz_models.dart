@@ -1,69 +1,47 @@
-import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 
-enum QuizCategory {
-  vehicle,
-  food,
-  animal,
-  custom,
-}
+part 'quiz_models.g.dart';
 
-@immutable
+@HiveType(typeId: 1)
 class QuizQuestion {
-  final String id;
-  final String silhouetteImagePath;
-  final String? originalImagePath;
-  final String? answerText;
+  @HiveField(0)
+  String id;
 
-  const QuizQuestion({
+  @HiveField(1)
+  String? silhouetteImagePath;
+
+  @HiveField(2)
+  String? originalImagePath;
+
+  @HiveField(3)
+  String? answerText;
+
+  QuizQuestion({
     required this.id,
-    required this.silhouetteImagePath,
+    this.silhouetteImagePath,
     this.originalImagePath,
     this.answerText,
   });
-
-  QuizQuestion copyWith({
-    String? silhouetteImagePath,
-    String? originalImagePath,
-    String? answerText,
-  }) {
-    return QuizQuestion(
-      id: id,
-      silhouetteImagePath: silhouetteImagePath ?? this.silhouetteImagePath,
-      originalImagePath: originalImagePath ?? this.originalImagePath,
-      answerText: answerText ?? this.answerText,
-    );
-  }
 }
 
-@immutable
+@HiveType(typeId: 2)
 class QuizSet {
-  final String id;
-  final String title;
-  final QuizCategory category;
-  final List<QuizQuestion> questions;
-  final bool isCustom;
-  final DateTime createdAt;
+  @HiveField(0)
+  String id;
 
-  const QuizSet({
+  @HiveField(1)
+  String title;
+
+  @HiveField(2)
+  List<QuizQuestion> questions;
+
+  @HiveField(3)
+  bool isCustom;
+
+  QuizSet({
     required this.id,
     required this.title,
-    required this.category,
     required this.questions,
-    required this.isCustom,
-    required this.createdAt,
+    this.isCustom = false,
   });
-
-  QuizSet copyWith({
-    String? title,
-    List<QuizQuestion>? questions,
-  }) {
-    return QuizSet(
-      id: id,
-      title: title ?? this.title,
-      category: category,
-      questions: questions ?? this.questions,
-      isCustom: isCustom,
-      createdAt: createdAt,
-    );
-  }
 }

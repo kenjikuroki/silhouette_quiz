@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
-import 'app.dart';
-import 'state/quiz_app_state.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
-  final appState = QuizAppState();
+import 'models/quiz_models.dart';
+import 'state/quiz_app_state.dart';
+import 'app.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(QuizQuestionAdapter());
+  Hive.registerAdapter(QuizSetAdapter());
+
+  final QuizAppState appState = QuizAppState();
+  await appState.initialize();
+
   runApp(MyApp(appState: appState));
 }

@@ -1,12 +1,16 @@
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 
 import '../models/quiz_models.dart';
 import '../services/purchase_service.dart';
 import '../services/silhouette_service.dart';
 
 class QuizAppState extends ChangeNotifier {
+  static const String customQuizBoxName = 'custom_quiz_sets';
+
+  late Box<QuizSet> _customQuizBox;
+
   final List<QuizSet> _defaultQuizSets = <QuizSet>[];
-  final List<QuizSet> _customQuizSets = <QuizSet>[];
 
   final PurchaseService purchaseService = PurchaseService();
   final SilhouetteService silhouetteService = SilhouetteService();
@@ -14,13 +18,16 @@ class QuizAppState extends ChangeNotifier {
   static const int freeCustomQuizLimit = 3;
 
   List<QuizSet> get defaultQuizSets => List.unmodifiable(_defaultQuizSets);
-  List<QuizSet> get customQuizSets => List.unmodifiable(_customQuizSets);
+  List<QuizSet> get customQuizSets => _customQuizBox.values.toList().cast<QuizSet>().reversed.toList();
 
   bool get isFullVersionPurchased => purchaseService.isFullVersionPurchased;
 
   Future<void> initialize() async {
+    _customQuizBox = await Hive.openBox<QuizSet>(customQuizBoxName);
     await purchaseService.loadPurchaseState();
+    await silhouetteService.initialize();
     _loadDefaultQuizzes();
+    notifyListeners();
   }
 
   void _loadDefaultQuizzes() {
@@ -30,9 +37,7 @@ class QuizAppState extends ChangeNotifier {
       QuizSet(
         id: 'vehicle_1',
         title: 'のりものクイズ',
-        category: QuizCategory.vehicle,
         isCustom: false,
-        createdAt: DateTime.now(),
         questions: [
           silhouetteService.createDummyQuestion(),
           silhouetteService.createDummyQuestion(),
@@ -41,9 +46,7 @@ class QuizAppState extends ChangeNotifier {
       QuizSet(
         id: 'food_1',
         title: 'たべものクイズ',
-        category: QuizCategory.food,
         isCustom: false,
-        createdAt: DateTime.now(),
         questions: [
           silhouetteService.createDummyQuestion(),
           silhouetteService.createDummyQuestion(),
@@ -52,9 +55,7 @@ class QuizAppState extends ChangeNotifier {
       QuizSet(
         id: 'animal_1',
         title: 'どうぶつクイズ',
-        category: QuizCategory.animal,
         isCustom: false,
-        createdAt: DateTime.now(),
         questions: [
           silhouetteService.createDummyQuestion(),
           silhouetteService.createDummyQuestion(),
@@ -65,53 +66,52 @@ class QuizAppState extends ChangeNotifier {
 
   bool canCreateCustomQuizSet() {
     if (isFullVersionPurchased) return true;
-    return _customQuizSets.length < freeCustomQuizLimit;
+    return customQuizSets.length < freeCustomQuizLimit;
   }
 
   Future<bool> ensureCanCreateCustomQuizSet() async {
     if (canCreateCustomQuizSet()) {
       return true;
     }
-    // 課金してもよいかは UI 側で確認ダイアログを出してから呼ぶ想定でもOKだが、
-    // MVPでは「ここで購買を試みる」形にしておく。
     final bool result = await purchaseService.purchaseFullVersion();
+    notifyListeners();
     return result;
   }
 
-  void addCustomQuizSet({
+  Future<void> addCustomQuizSet({
     required String title,
     required List<QuizQuestion> questions,
-  }) {
+  }) async {
     final QuizSet set = QuizSet(
       id: 'custom_${DateTime.now().millisecondsSinceEpoch}',
       title: title,
-      category: QuizCategory.custom,
       isCustom: true,
-      createdAt: DateTime.now(),
       questions: List<QuizQuestion>.from(questions),
     );
-    _customQuizSets.insert(0, set);
+    await _customQuizBox.put(set.id, set);
     notifyListeners();
   }
 
-  void deleteCustomQuizSet(String id) {
-    _customQuizSets.removeWhere((set) => set.id == id);
+  Future<void> deleteCustomQuizSet(String id) async {
+    await _customQuizBox.delete(id);
     notifyListeners();
   }
 
   List<QuizSet> getRecentCustomQuizSets(int limit) {
-    if (_customQuizSets.length <= limit) {
-      return List<QuizSet>.from(_customQuizSets);
+    final sets = customQuizSets;
+    if (sets.length <= limit) {
+      return sets;
     }
-    return _customQuizSets.sublist(0, limit);
+    return sets.sublist(0, limit);
   }
 
   QuizSet? findQuizSetById(String id) {
     for (final QuizSet set in _defaultQuizSets) {
       if (set.id == id) return set;
     }
-    for (final QuizSet set in _customQuizSets) {
-      if (set.id == id) return set;
+    // Hive box lookup
+    if (_customQuizBox.containsKey(id)) {
+        return _customQuizBox.get(id);
     }
     return null;
   }

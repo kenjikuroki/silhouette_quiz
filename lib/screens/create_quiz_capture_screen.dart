@@ -65,6 +65,12 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                               )
                             : const Icon(Icons.photo),
                         title: Text('もんだい ${index + 1}'),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () {
+                            _confirmRemoveQuestion(context, index);
+                          },
+                        ),
                       ),
                     );
                   },
@@ -120,19 +126,58 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
       return;
     }
 
-    final String path = picked.path;
+    final String originalPath = picked.path;
+
+    // シルエット画像を生成
+    final String silhouettePath =
+        await appState.silhouetteService.createSilhouette(originalPath);
 
     final QuizQuestion question = QuizQuestion(
       id:
           'custom_${DateTime.now().microsecondsSinceEpoch}_${_tempQuestions.length}',
-      // ★ MVP ではひとまず元画像のパスを両方に入れておく
-      silhouetteImagePath: path,
-      originalImagePath: path,
+      silhouetteImagePath: silhouettePath,
+      originalImagePath: originalPath,
       answerText: null,
     );
 
     setState(() {
       _tempQuestions.add(question);
+    });
+  }
+
+  void _confirmRemoveQuestion(BuildContext context, int index) async {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+
+    final bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(l10n.captureDeleteTitle),
+          content: Text(l10n.captureDeleteMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.commonCancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l10n.captureDeleteOk),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      setState(() {
+        _tempQuestions.removeAt(index);
+      });
+    }
+  }
+
+  void _removeQuestion(int index) {
+    setState(() {
+      _tempQuestions.removeAt(index);
     });
   }
 }

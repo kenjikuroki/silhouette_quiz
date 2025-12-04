@@ -49,6 +49,9 @@ class AppLocalizations {
       'create_capture_count': 'いま {count} まい',
       'create_capture_finish': 'かんりょう',
       'create_capture_limit_message': 'これいじょう は とれません（10まい まで）',
+      'capture_delete_title': 'この もんだいを けす？',
+      'capture_delete_message': 'あとから もどせないよ。',
+      'capture_delete_ok': 'けす',
       'create_confirm_title': 'これで いい？',
       'create_confirm_message': 'とった しゃしん から クイズを つくります。',
       'create_confirm_title_label': 'クイズの なまえ',
@@ -120,6 +123,9 @@ class AppLocalizations {
   String get createCaptureFinish => _translate('create_capture_finish');
   String get createCaptureLimitMessage =>
       _translate('create_capture_limit_message');
+  String get captureDeleteTitle => _translate('capture_delete_title');
+  String get captureDeleteMessage => _translate('capture_delete_message');
+  String get captureDeleteOk => _translate('capture_delete_ok');
   String get createConfirmTitle => _translate('create_confirm_title');
   String get createConfirmMessage => _translate('create_confirm_message');
   String get createConfirmTitleLabel => _translate('create_confirm_title_label');

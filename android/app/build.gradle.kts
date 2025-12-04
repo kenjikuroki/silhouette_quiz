@@ -24,6 +24,7 @@ android {
         applicationId = "com.example.silhouette_quiz"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // ML Kit requires minSdk 21 (Android 5.0) or higher
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

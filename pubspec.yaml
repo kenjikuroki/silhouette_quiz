@@ -21,7 +21,20 @@ dependencies:
   # ★ 追加：カメラ・ギャラリーから画像を取る
   image_picker: ^1.0.7
 
+  # Hive
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.2
+
+  # Image processing
+  image: ^4.1.3
+
+  # ML Kit for subject segmentation
+  google_mlkit_subject_segmentation: ^0.0.2
+
 dev_dependencies:
+  hive_generator: ^2.0.0
+  build_runner: ^2.3.3
   flutter_test:
     sdk: flutter
 

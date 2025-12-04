@@ -164,11 +164,11 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
     );
   }
 
-  /// シルエット表示（MVP版）
-  /// - 自作クイズ: 撮った写真を黒っぽくフィルタして「なんとなくシルエット」にする
-  /// - デフォルトクイズ: これまでのカラフルダミーを継続
+  /// シルエット表示
+  /// - 自作クイズ: ML Kitで生成されたシルエット画像（背景透明、被写体黒）
+  /// - デフォルトクイズ: カラフルダミー
   Widget _buildQuestionVisual(QuizQuestion question) {
-    final String? path = question.silhouetteImagePath.isNotEmpty
+    final String? path = (question.silhouetteImagePath?.isNotEmpty == true)
         ? question.silhouetteImagePath
         : question.originalImagePath;
 
@@ -179,15 +179,11 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
       final File file = File(path!);
       return ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: ColorFiltered(
-          // 真っ黒ではないけど、暗めでシルエットっぽく見せる
-          colorFilter: const ColorFilter.mode(
-            Colors.black54,
-            BlendMode.darken,
-          ),
+        child: Container(
+          color: Colors.grey[300], // グレー背景で白いシルエットを見やすく
           child: Image.file(
             file,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
         ),
       );
