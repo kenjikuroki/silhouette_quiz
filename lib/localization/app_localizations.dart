@@ -55,6 +55,7 @@ class AppLocalizations {
       'create_confirm_title': 'これで いい？',
       'create_confirm_message': 'とった しゃしん から クイズを つくります。',
       'create_confirm_title_label': 'クイズの なまえ',
+      'create_confirm_default_title': 'もんだい{number}',
       'create_confirm_save_button': 'これでOK！',
       'create_confirm_back_button': 'もどる',
 
@@ -131,6 +132,13 @@ class AppLocalizations {
   String get createConfirmTitleLabel => _translate('create_confirm_title_label');
   String get createConfirmSaveButton => _translate('create_confirm_save_button');
   String get createConfirmBackButton => _translate('create_confirm_back_button');
+  String createConfirmDefaultTitle(int number) {
+    String template = _translate('create_confirm_default_title');
+    if (template == 'create_confirm_default_title') {
+      template = 'もんだい{number}';
+    }
+    return template.replaceAll('{number}', number.toString());
+  }
 
   String get playQuizTitle => _translate('play_quiz_title');
   String get playQuizShowAnswer => _translate('play_quiz_show_answer');

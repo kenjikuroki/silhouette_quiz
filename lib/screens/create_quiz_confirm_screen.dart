@@ -33,6 +33,7 @@ class CreateQuizConfirmScreen extends StatefulWidget {
 
 class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen> {
   final TextEditingController _titleController = TextEditingController();
+  bool _defaultTitleApplied = false;
 
   QuizAppState get appState => widget.appState;
 
@@ -45,6 +46,15 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    if (!_defaultTitleApplied) {
+      final int defaultNumber = widget.appState.customQuizSets.length + 1;
+      final String defaultTitle =
+          l10n.createConfirmDefaultTitle(defaultNumber);
+      _titleController.text = defaultTitle;
+      _titleController.selection =
+          TextSelection.fromPosition(TextPosition(offset: defaultTitle.length));
+      _defaultTitleApplied = true;
+    }
 
     return Scaffold(
       appBar: AppBar(

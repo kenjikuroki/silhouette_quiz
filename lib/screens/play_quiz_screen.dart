@@ -81,7 +81,10 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
                 child: Center(
                   child: AspectRatio(
                     aspectRatio: 1,
-                    child: _buildQuestionVisual(question),
+                    child: _buildQuestionVisual(
+                      question,
+                      showOriginalImage: _showAnswer,
+                    ),
                   ),
                 ),
               ),
@@ -165,12 +168,20 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
   }
 
   /// シルエット表示
-  /// - 自作クイズ: ML Kitで生成されたシルエット画像（背景透明、被写体黒）
-  /// - デフォルトクイズ: カラフルダミー
-  Widget _buildQuestionVisual(QuizQuestion question) {
-    final String? path = (question.silhouetteImagePath?.isNotEmpty == true)
-        ? question.silhouetteImagePath
-        : question.originalImagePath;
+  /// - 答え表示前: シルエット画像を優先
+  /// - 答え表示時: 元の写真を優先（なければシルエット）
+  Widget _buildQuestionVisual(
+    QuizQuestion question, {
+    required bool showOriginalImage,
+  }) {
+    String? path;
+    if (showOriginalImage && (question.originalImagePath?.isNotEmpty == true)) {
+      path = question.originalImagePath;
+    } else if (question.silhouetteImagePath?.isNotEmpty == true) {
+      path = question.silhouetteImagePath;
+    } else {
+      path = question.originalImagePath;
+    }
 
     final bool hasFile =
         path != null && path.isNotEmpty && File(path).existsSync();
@@ -183,7 +194,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
           color: Colors.grey[300], // グレー背景で白いシルエットを見やすく
           child: Image.file(
             file,
-            fit: BoxFit.contain,
+            fit: BoxFit.cover,
           ),
         ),
       );
