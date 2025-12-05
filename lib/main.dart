@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'models/quiz_models.dart';
@@ -15,6 +16,11 @@ void main() async {
 
   final QuizAppState appState = QuizAppState();
   await appState.initialize();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
 
   runApp(MyApp(appState: appState));
 }

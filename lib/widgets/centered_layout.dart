@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class CenteredLayout extends StatelessWidget {
   final Widget child;
+  final Color backgroundColor;
 
   const CenteredLayout({
     Key? key,
     required this.child,
+    this.backgroundColor = Colors.white,
   }) : super(key: key);
 
   static const double maxContentWidth = 480.0;
@@ -15,7 +17,7 @@ class CenteredLayout extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return ColoredBox(
-          color: Colors.white, // TODO: 後で背景をいい感じに
+          color: backgroundColor,
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(

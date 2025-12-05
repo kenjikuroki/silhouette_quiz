@@ -43,6 +43,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # あとで画像などを追加する場合はここに書く
-  # assets:
-  #   - assets/images/
+  assets:
+    - assets/images/backgrounds/factoryBackground.png
+    - assets/images/character/
+
+    - assets/images/button/

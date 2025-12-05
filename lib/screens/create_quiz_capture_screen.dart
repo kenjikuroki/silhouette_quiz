@@ -25,7 +25,7 @@ class CreateQuizCaptureScreen extends StatefulWidget {
 }
 
 class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
-  static const int maxImages = 10;
+  static const int maxImages = 7;
 
   final List<QuizQuestion> _tempQuestions = <QuizQuestion>[];
 
