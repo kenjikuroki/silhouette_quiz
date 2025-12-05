@@ -45,6 +45,8 @@ flutter:
 
   assets:
     - assets/images/backgrounds/
+    - assets/images/quiz/home/
     - assets/images/character/
 
     - assets/images/button/
+    - assets/images/conveyor.png

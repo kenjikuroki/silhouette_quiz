@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as Math;
 
 import 'package:flutter/material.dart';
 
@@ -33,21 +34,75 @@ class PlayQuizScreen extends StatefulWidget {
   State<PlayQuizScreen> createState() => _PlayQuizScreenState();
 }
 
-class _PlayQuizScreenState extends State<PlayQuizScreen> {
+class _PlayQuizScreenState extends State<PlayQuizScreen>
+    with TickerProviderStateMixin {
   int _currentIndex = 0;
-  bool _showAnswer = false;
-  bool _hasAnsweredCurrent = false;
+  final Set<int> _revealedIndices = {}; // Indices where answer is shown
+  final Set<int> _answeredIndices = {}; // Indices where user answered (buttons disabled)
   int _correctCount = 0;
 
+  late PageController _pageController;
+  late AnimationController _initialSlideController;
+  late Animation<Offset> _initialSlideAnimation;
+  late AnimationController _conveyorController;
+  
+  List<QuizQuestion> _questions = []; // Local shuffled copy
+
   QuizAppState get appState => widget.appState;
+
   SilhouetteService get silhouetteService => appState.silhouetteService;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+
+    // Initial slide-in animation (Right to Center)
+    _initialSlideController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+    _initialSlideAnimation = Tween<Offset>(
+      begin: const Offset(1.0, 0.0), // Start from right
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _initialSlideController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Conveyor vibration controller
+    _conveyorController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+
+    // Start the initial animations
+    _initialSlideController.forward();
+    _conveyorController.forward();
+
+    // Load and shuffle questions
+    final QuizSet? quizSet = appState.findQuizSetById(widget.quizSetId);
+    if (quizSet != null && quizSet.questions.isNotEmpty) {
+      _questions = List<QuizQuestion>.from(quizSet.questions)..shuffle();
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _initialSlideController.dispose();
+    _conveyorController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final QuizSet? quizSet = appState.findQuizSetById(widget.quizSetId);
-
-    if (quizSet == null || quizSet.questions.isEmpty) {
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    // Use local shuffled questions
+    if (_questions.isEmpty) {
       return Scaffold(
         body: Stack(
           children: [
@@ -55,6 +110,15 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
               child: Image.asset(
                 'assets/images/backgrounds/background_quiz.png',
                 fit: BoxFit.cover,
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Image.asset(
+                'assets/images/conveyor.png',
+                fit: BoxFit.fitWidth,
               ),
             ),
             SafeArea(
@@ -72,8 +136,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
       );
     }
 
-    final QuizQuestion question = quizSet.questions[_currentIndex];
-    final bool isLast = _currentIndex == quizSet.questions.length - 1;
+    final bool isLast = _currentIndex == _questions.length - 1;
 
     return Scaffold(
       body: Stack(
@@ -84,109 +147,157 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
               fit: BoxFit.cover,
             ),
           ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: AnimatedBuilder(
+              animation: _conveyorController,
+              builder: (context, child) {
+                // Simple vibration logic: sin wave
+                // 10 cycles over 2 seconds, amplitude 3.0
+                final double offset = 
+                    Math.sin(_conveyorController.value * 2 * Math.pi * 10) * 3.0;
+                return Transform.translate(
+                  offset: Offset(0, offset),
+                  child: child,
+                );
+              },
+              child: Image.asset(
+                'assets/images/conveyor.png',
+                fit: BoxFit.fitWidth,
+              ),
+            ),
+          ),
           SafeArea(
+            bottom: false, // Allow overlap with conveyor
             child: Stack(
               children: [
                 CenteredLayout(
                   backgroundColor: Colors.transparent,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.only(
+                      top: 16,
+                      left: 16,
+                      right: 16,
+                      bottom: 0, // No bottom padding to allow overlap
+                    ),
                     child: Column(
                       children: [
                         Text(
-                          '${_currentIndex + 1} / ${quizSet.questions.length}',
+                          '${_currentIndex + 1} / ${_questions.length}',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 16),
                         Expanded(
-                          child: Center(
-                            child: AspectRatio(
-                              aspectRatio: 1,
-                              child: _buildQuestionVisual(
-                                question,
-                                showOriginalImage: _showAnswer,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        if (_showAnswer)
-                          Column(
-                            children: [
-                              Text(
-                                l10n.playQuizAnswerLabel,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                          child: OverflowBox(
+                            maxWidth: MediaQuery.of(context).size.width,
+                            minWidth: MediaQuery.of(context).size.width,
+                            child: PageView.builder(
+                              controller: _pageController,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _questions.length,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  _currentIndex = index;
+                                });
+                              },
+                              itemBuilder: (context, index) {
+                              final question = _questions[index];
+                              final bool showAnswer = _revealedIndices.contains(index);
+                              final bool hasAnswered = _answeredIndices.contains(index);
+                              
+                              Widget content = Align(
+                                alignment: Alignment.bottomCenter,
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 300,
+                                    maxHeight: 300,
+                                  ),
+                                  child: AspectRatio(
+                                    aspectRatio: 1,
+                                    child: _buildQuestionVisual(
+                                      question,
+                                      showOriginalImage: showAnswer,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                question.answerText ??
-                                    'こたえは じぶんたちで おはなししてね！',
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: _hasAnsweredCurrent
-                                        ? null
-                                        : () => _onSelfJudge(isCorrect: true),
-                                    child: Text(l10n.playQuizCorrect),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: _hasAnsweredCurrent
-                                        ? null
-                                        : () => _onSelfJudge(isCorrect: false),
-                                    child: Text(l10n.playQuizIncorrect),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                              );
+
+                              // Apply initial slide-in only for the first item
+                              if (index == 0) {
+                                return SlideTransition(
+                                  position: _initialSlideAnimation,
+                                  child: content,
+                                );
+                              }
+                              return content;
+                            },
+                          ), // PageView
+                        ), // OverflowBox
+                      ), // Expanded
                         const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: _showAnswer
-                                  ? null
-                                  : () {
+                        SizedBox(
+                          height: 80,
+                          child: !_revealedIndices.contains(_currentIndex)
+                              ? Center(
+                                  child: ElevatedButton(
+                                    onPressed: () {
                                       setState(() {
-                                        _showAnswer = true;
-                                        _hasAnsweredCurrent = false;
+                                        _revealedIndices.add(_currentIndex);
+                                        _answeredIndices.remove(_currentIndex); // Ensure reset if revisiting? No, linear flow.
                                       });
                                     },
-                              child: Text(l10n.playQuizShowAnswer),
-                            ),
-                            ElevatedButton(
-                              onPressed: (!_hasAnsweredCurrent)
-                                  ? null
-                                  : () {
-                                      if (isLast) {
-                                        _finishQuiz(context, quizSet);
-                                      } else {
-                                        setState(() {
-                                          _currentIndex++;
-                                          _showAnswer = false;
-                                          _hasAnsweredCurrent = false;
-                                        });
-                                      }
-                                    },
-                              child: Text(
-                                isLast
-                                    ? l10n.playQuizFinish
-                                    : l10n.playQuizNext,
-                              ),
-                            ),
-                          ],
+                                    child: Text(l10n.playQuizShowAnswer),
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () => _onSelfJudge(
+                                        context,
+                                        isCorrect: true,
+                                      ),
+                                      child: Text(l10n.playQuizCorrect),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () => _onSelfJudge(
+                                        context,
+                                        isCorrect: false,
+                                      ),
+                                      child: Text(l10n.playQuizIncorrect),
+                                    ),
+                                  ],
+                                ),
                         ),
                       ],
                     ),
                   ),
                 ),
+                // Independent Answer Text Overlay
+                if (_revealedIndices.contains(_currentIndex))
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: Text(
+                      _questions[_currentIndex].answerText ?? '',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 4,
+                            color: Colors.white,
+                            offset: Offset(0, 0),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 const CornerBackButton(),
               ],
             ),
@@ -212,6 +323,34 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
       path = question.originalImagePath;
     }
 
+    // Check for Asset path
+    if (path != null && path.startsWith('assets/')) {
+       final imageWidget = ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          color: Colors.transparent, 
+          child: Image.asset(
+            path,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+               return Container(
+                decoration: BoxDecoration(
+                  color: silhouetteService.randomSilhouetteColor(),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Center(
+                  child: Text('Image Load Error', style: TextStyle(color: Colors.white)),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+      
+      return imageWidget;
+    }
+
+    // Check for File path
     bool hasFile = false;
     if (path != null && path.isNotEmpty) {
       try {
@@ -224,7 +363,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
 
     if (hasFile) {
       final File file = File(path!);
-      return ClipRRect(
+      final imageWidget = ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: Container(
           color: Colors.grey[300], // グレー背景で白いシルエットを見やすく
@@ -234,6 +373,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
           ),
         ),
       );
+      return imageWidget;
     }
 
     // デフォルトクイズ用（画像がない場合）
@@ -254,18 +394,37 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
     );
   }
 
-  void _onSelfJudge({required bool isCorrect}) {
-    setState(() {
-      if (!_hasAnsweredCurrent && isCorrect) {
-        _correctCount++;
-      }
-      _hasAnsweredCurrent = true;
-    });
+
+
+  void _onSelfJudge(
+    BuildContext context, {
+    required bool isCorrect,
+  }) {
+    // 正解数カウント
+    if (isCorrect) {
+      _correctCount++;
+    }
+
+    _answeredIndices.add(_currentIndex);
+
+    // 次へ進む判定
+    final bool isLast = _currentIndex == _questions.length - 1;
+    if (isLast) {
+      _finishQuiz(context);
+    } else {
+      // 2秒かけて次の問題へスライド
+      _pageController.nextPage(
+        duration: const Duration(seconds: 2),
+        curve: Curves.easeInOut,
+      );
+      // コンベアも振動させる
+      _conveyorController.forward(from: 0);
+    }
   }
 
-  void _finishQuiz(BuildContext context, QuizSet quizSet) {
+  void _finishQuiz(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final int total = quizSet.questions.length;
+    final int total = _questions.length;
     final String message = l10n.playQuizResultMessage(_correctCount, total);
 
     showDialog<void>(

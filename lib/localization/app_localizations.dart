@@ -34,6 +34,7 @@ class AppLocalizations {
       'category_vehicle': 'のりもの',
       'category_food': 'たべもの',
       'category_animal': 'どうぶつ',
+      'category_home': 'おうちのなかクイズ',
 
       // Custom list
       'custom_list_title': 'きみがつくったクイズ',
@@ -112,6 +113,7 @@ class AppLocalizations {
   String get categoryVehicle => _translate('category_vehicle');
   String get categoryFood => _translate('category_food');
   String get categoryAnimal => _translate('category_animal');
+  String get categoryHome => _translate('category_home');
 
   String get customListTitle => _translate('custom_list_title');
   String get customListEmpty => _translate('custom_list_empty');

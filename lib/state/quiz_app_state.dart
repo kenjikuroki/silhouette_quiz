@@ -61,6 +61,43 @@ class QuizAppState extends ChangeNotifier {
           silhouetteService.createDummyQuestion(),
         ],
       ),
+      QuizSet(
+        id: 'home_1',
+        title: 'おうちのなかクイズ',
+        isCustom: false,
+        questions: [
+          QuizQuestion(
+            id: 'home_bed',
+            silhouetteImagePath: 'assets/images/quiz/home/bed_b.png',
+            originalImagePath: 'assets/images/quiz/home/bed.png',
+            answerText: 'ベッド',
+          ),
+          QuizQuestion(
+            id: 'home_brush',
+            silhouetteImagePath: 'assets/images/quiz/home/brush_b.png',
+            originalImagePath: 'assets/images/quiz/home/brush.png',
+            answerText: 'はぶらし',
+          ),
+          QuizQuestion(
+            id: 'home_chair',
+            silhouetteImagePath: 'assets/images/quiz/home/chair_b.png',
+            originalImagePath: 'assets/images/quiz/home/chair.png',
+            answerText: 'いす',
+          ),
+          QuizQuestion(
+            id: 'home_cup',
+            silhouetteImagePath: 'assets/images/quiz/home/cup_b.png',
+            originalImagePath: 'assets/images/quiz/home/cup.png',
+            answerText: 'コップ',
+          ),
+          QuizQuestion(
+            id: 'home_phone',
+            silhouetteImagePath: 'assets/images/quiz/home/phone_B.png',
+            originalImagePath: 'assets/images/quiz/home/phone.png',
+            answerText: 'でんわ',
+          ),
+        ],
+      ),
     ]);
   }
 
