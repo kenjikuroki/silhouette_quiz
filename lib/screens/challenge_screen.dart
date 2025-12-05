@@ -26,114 +26,125 @@ class ChallengeScreen extends StatelessWidget {
         appState.getRecentCustomQuizSets(6);
 
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            CenteredLayout(
-              maxContentWidth: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 左側: みんなのクイズ
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Text(
-                            l10n.challengeDefaultSectionTitle,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            child: ListView(
-                              children: defaultSets
-                                  .map(
-                                    (set) => Card(
-                                      child: ListTile(
-                                        title: Text(set.title),
-                                        onTap: () {
-                                          Navigator.of(context).pushNamed(
-                                            PlayQuizScreen.routeName,
-                                            arguments: PlayQuizArguments(
-                                                quizSetId: set.id),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    // 右側: きみがつくったクイズ
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Text(
-                            l10n.challengeCustomSectionTitle,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            child: ListView(
-                              children: [
-                                if (recentCustomSets.isEmpty)
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    child: Text(
-                                      l10n.customListEmpty,
-                                      style:
-                                          const TextStyle(color: Colors.grey),
-                                    ),
-                                  )
-                                else
-                                  ...recentCustomSets.map(
-                                    (set) => Card(
-                                      child: ListTile(
-                                        title: Text(set.title),
-                                        onTap: () {
-                                          Navigator.of(context).pushNamed(
-                                            PlayQuizScreen.routeName,
-                                            arguments: PlayQuizArguments(
-                                                quizSetId: set.id),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                if (appState.customQuizSets.isNotEmpty)
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pushNamed(
-                                        CustomQuizListScreen.routeName,
-                                      );
-                                    },
-                                    child: Text(l10n.challengeMoreButton),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/backgrounds/backgrround_start_list.png',
+              fit: BoxFit.cover,
             ),
-            const CornerBackButton(),
-          ],
-        ),
+          ),
+          SafeArea(
+            child: Stack(
+              children: [
+                CenteredLayout(
+                  maxContentWidth: double.infinity,
+                  backgroundColor: Colors.transparent,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 左側: みんなのクイズ
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                l10n.challengeDefaultSectionTitle,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Expanded(
+                                child: ListView(
+                                  children: defaultSets
+                                      .map(
+                                        (set) => Card(
+                                          child: ListTile(
+                                            title: Text(set.title),
+                                            onTap: () {
+                                              Navigator.of(context).pushNamed(
+                                                PlayQuizScreen.routeName,
+                                                arguments: PlayQuizArguments(
+                                                    quizSetId: set.id),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 24),
+                        // 右側: きみがつくったクイズ
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                l10n.challengeCustomSectionTitle,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Expanded(
+                                child: ListView(
+                                  children: [
+                                    if (recentCustomSets.isEmpty)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.symmetric(vertical: 8),
+                                        child: Text(
+                                          l10n.customListEmpty,
+                                          style:
+                                              const TextStyle(color: Colors.grey),
+                                        ),
+                                      )
+                                    else
+                                      ...recentCustomSets.map(
+                                        (set) => Card(
+                                          child: ListTile(
+                                            title: Text(set.title),
+                                            onTap: () {
+                                              Navigator.of(context).pushNamed(
+                                                PlayQuizScreen.routeName,
+                                                arguments: PlayQuizArguments(
+                                                    quizSetId: set.id),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    if (appState.customQuizSets.isNotEmpty)
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pushNamed(
+                                            CustomQuizListScreen.routeName,
+                                          );
+                                        },
+                                        child: Text(l10n.challengeMoreButton),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const CornerBackButton(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

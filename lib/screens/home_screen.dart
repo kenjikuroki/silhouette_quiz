@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen>
                 child: GestureDetector(
                   onTap: _dropCharacter,
                   child: Image.asset(
-                    'assets/images/backgrounds/factoryBackground.png',
+                    'assets/images/backgrounds/background.png',
                     fit: BoxFit.cover,
                   ),
                 ),

@@ -98,9 +98,8 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
+
+
     // Use local shuffled questions
     if (_questions.isEmpty) {
       return Scaffold(
@@ -280,12 +279,12 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                 // Independent Answer Text Overlay
                 if (_revealedIndices.contains(_currentIndex))
                   Positioned(
-                    top: 16,
-                    right: 16,
+                    top: 120, // Raised from 200
+                    right: 100, // Shift closer to center from 16
                     child: Text(
                       _questions[_currentIndex].answerText ?? '',
                       style: const TextStyle(
-                        fontSize: 32,
+                        fontSize: 60, // Larger text
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                         shadows: [

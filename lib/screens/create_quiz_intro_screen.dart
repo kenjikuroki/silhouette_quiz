@@ -21,40 +21,51 @@ class CreateQuizIntroScreen extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            CenteredLayout(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        l10n.createIntroMessage,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final bool canCreate =
-                              await appState.ensureCanCreateCustomQuizSet();
-                          if (!canCreate) {
-                            return;
-                          }
-                          Navigator.of(context).pushNamed(
-                            CreateQuizCaptureScreen.routeName,
-                          );
-                        },
-                        child: Text(l10n.createIntroStartButton),
-                      ),
-                    ],
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/backgrounds/backgrround_start.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          SafeArea(
+            child: Stack(
+              children: [
+                CenteredLayout(
+                  backgroundColor: Colors.transparent,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          l10n.createIntroMessage,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final bool canCreate =
+                                await appState.ensureCanCreateCustomQuizSet();
+                            if (!canCreate) {
+                              return;
+                            }
+                            Navigator.of(context).pushNamed(
+                              CreateQuizCaptureScreen.routeName,
+                            );
+                          },
+                          child: Text(l10n.createIntroStartButton),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            const CornerBackButton(),
-          ],
-        ),
+                const CornerBackButton(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -49,5 +49,11 @@
 	<string>カメラを使ってクイズ用の写真を撮影します</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>ギャラリーから写真を選択してクイズを作成します</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartobservatory._tcp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Used for debugging and local network discovery</string>
 </dict>
 </plist>
