@@ -4,6 +4,7 @@ import '../localization/app_localizations.dart';
 import '../models/quiz_models.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
+import '../widgets/corner_back_button.dart';
 import 'play_quiz_screen.dart';
 
 class CustomQuizListScreen extends StatelessWidget {
@@ -22,34 +23,38 @@ class CustomQuizListScreen extends StatelessWidget {
     final List<QuizSet> customSets = appState.customQuizSets;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.customListTitle),
-      ),
-      body: CenteredLayout(
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: customSets.length,
-          itemBuilder: (context, index) {
-            final QuizSet set = customSets[index];
-            return Card(
-              child: ListTile(
-                title: Text(set.title),
-                subtitle: Text('${set.questions.length} もん'),
-                onTap: () {
-                  Navigator.of(context).pushNamed(
-                    PlayQuizScreen.routeName,
-                    arguments: PlayQuizArguments(quizSetId: set.id),
-                  );
-                },
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () {
-                    _confirmDelete(context, set.id);
+      body: SafeArea(
+        child: Stack(
+          children: [
+            CenteredLayout(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: customSets.length,
+                  itemBuilder: (context, index) {
+                    final QuizSet set = customSets[index];
+                    return Card(
+                      child: ListTile(
+                        title: Text(set.title),
+                        subtitle: Text('${set.questions.length} もん'),
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                            PlayQuizScreen.routeName,
+                            arguments: PlayQuizArguments(quizSetId: set.id),
+                          );
+                        },
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () {
+                            _confirmDelete(context, set.id);
+                          },
+                        ),
+                      ),
+                    );
                   },
                 ),
               ),
-            );
-          },
+            const CornerBackButton(),
+          ],
         ),
       ),
     );

@@ -146,6 +146,27 @@ class _HomeScreenState extends State<HomeScreen>
           final double w = constraints.maxWidth;
           final double h = constraints.maxHeight;
 
+          const double designWidth = 1024;
+          const double designHeight = 768;
+          const double challengeLeft = 170;
+          const double challengeBottom = 110;
+          const double challengeWidth = 440;
+          const double createLeft = 480;
+          const double createBottom = 140;
+          const double createWidth = 360;
+
+          final double scale =
+              min(w / designWidth, h / designHeight).clamp(0.5, 1.2);
+          final double horizontalOffset = (w - designWidth * scale) / 2;
+          final double verticalOffset = (h - designHeight * scale) / 2;
+          final bool isMobile = w < 1200;
+          final double challengeBottomPos = isMobile
+              ? h * 0.03
+              : verticalOffset + (challengeBottom - 60) * scale;
+          final double createBottomPos = isMobile
+              ? h * 0.06
+              : verticalOffset + (createBottom - 60) * scale;
+
           return Stack(
             children: [
               Positioned.fill(
@@ -157,13 +178,11 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
               ),
-
-
               Positioned(
-                left: w * 0.16,
-                bottom: h * 0.20,
+                left: horizontalOffset + challengeLeft * scale,
+                bottom: challengeBottomPos,
                 child: _buildActionObject(
-                  width: w * 0.52,
+                  width: challengeWidth * scale,
                   imagePath: _isChallengePressed
                       ? 'assets/images/button/challenge_bo_P.png'
                       : 'assets/images/button/challenge_bo.png',
@@ -173,10 +192,10 @@ class _HomeScreenState extends State<HomeScreen>
               ),
 
               Positioned(
-                right: w * 0.20,
-                bottom: h * 0.24,
+                left: horizontalOffset + createLeft * scale,
+                bottom: createBottomPos,
                 child: _buildActionObject(
-                  width: w * 0.40,
+                  width: createWidth * scale,
                   imagePath: _isCreatePressed
                       ? 'assets/images/button/myself_left_bo.png'
                       : 'assets/images/button/myself_right_bo.png',
@@ -229,29 +248,31 @@ class _HomeScreenState extends State<HomeScreen>
     required VoidCallback onPressed,
   }) {
     final double buttonWidth = width;
-    final double tapWidth = width * 0.6;
+    final double hitWidth = buttonWidth * 0.45;
+    final double hitHeight = buttonWidth * 0.28;
     return SizedBox(
       width: buttonWidth,
-      height: buttonWidth * 0.6,
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: SizedBox(
-          width: tapWidth,
-          height: tapWidth * 0.55,
-          child: Semantics(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Image.asset(
+            imagePath,
+            width: buttonWidth,
+            fit: BoxFit.contain,
+          ),
+          Semantics(
             button: true,
             label: semanticsLabel,
             child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
+              behavior: HitTestBehavior.translucent,
               onTap: onPressed,
-              child: Image.asset(
-                imagePath,
-                width: buttonWidth,
-                fit: BoxFit.contain,
+              child: SizedBox(
+                width: hitWidth,
+                height: hitHeight,
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -44,7 +44,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/backgrounds/factoryBackground.png
+    - assets/images/backgrounds/
     - assets/images/character/
 
     - assets/images/button/

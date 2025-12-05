@@ -4,6 +4,7 @@ import '../localization/app_localizations.dart';
 import '../models/quiz_models.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
+import '../widgets/corner_back_button.dart';
 import 'challenge_screen.dart';
 
 class CreateQuizConfirmArguments {
@@ -57,58 +58,60 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.createConfirmTitle),
-      ),
-      body: CenteredLayout(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text(
-                l10n.createConfirmMessage,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                  labelText: l10n.createConfirmTitleLabel,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            CenteredLayout(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(
+                        l10n.createConfirmMessage,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _titleController,
+                        decoration: InputDecoration(
+                          labelText: l10n.createConfirmTitleLabel,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(l10n.createConfirmBackButton),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              final String title = _titleController.text.trim();
+                              if (title.isEmpty) {
+                                return;
+                              }
+                              appState.addCustomQuizSet(
+                                title: title,
+                                questions: widget.tempQuestions,
+                              );
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                ChallengeScreen.routeName,
+                                (route) => route.isFirst,
+                              );
+                            },
+                            child: Text(l10n.createConfirmSaveButton),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(l10n.createConfirmBackButton),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      final String title = _titleController.text.trim();
-                      if (title.isEmpty) {
-                        // とりあえず簡単なバリデーション
-                        return;
-                      }
-                      appState.addCustomQuizSet(
-                        title: title,
-                        questions: widget.tempQuestions,
-                      );
-                      // チャレンジ画面に戻る
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        ChallengeScreen.routeName,
-                        (route) => route.isFirst,
-                      );
-                    },
-                    child: Text(l10n.createConfirmSaveButton),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            const CornerBackButton(),
+          ],
         ),
       ),
     );

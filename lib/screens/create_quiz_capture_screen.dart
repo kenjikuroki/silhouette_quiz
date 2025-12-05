@@ -7,6 +7,7 @@ import '../localization/app_localizations.dart';
 import '../models/quiz_models.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
+import '../widgets/corner_back_button.dart';
 import 'create_quiz_confirm_screen.dart';
 
 class CreateQuizCaptureScreen extends StatefulWidget {
@@ -38,77 +39,82 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
     final AppLocalizations l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.createCaptureTitle),
-      ),
-      body: CenteredLayout(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text(l10n.createCaptureCount(_tempQuestions.length)),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _tempQuestions.length,
-                  itemBuilder: (context, index) {
-                    final QuizQuestion question = _tempQuestions[index];
-                    return Card(
-                      child: ListTile(
-                        leading: (question.originalImagePath != null &&
-                                File(question.originalImagePath!).existsSync())
-                            ? Image.file(
-                                File(question.originalImagePath!),
-                                width: 48,
-                                height: 48,
-                                fit: BoxFit.cover,
-                              )
-                            : const Icon(Icons.photo),
-                        title: Text('もんだい ${index + 1}'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () {
-                            _confirmRemoveQuestion(context, index);
+      body: SafeArea(
+        child: Stack(
+          children: [
+            CenteredLayout(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(l10n.createCaptureCount(_tempQuestions.length)),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: _tempQuestions.length,
+                          itemBuilder: (context, index) {
+                            final QuizQuestion question = _tempQuestions[index];
+                            return Card(
+                              child: ListTile(
+                                leading: (question.originalImagePath != null &&
+                                        File(question.originalImagePath!)
+                                            .existsSync())
+                                    ? Image.file(
+                                        File(question.originalImagePath!),
+                                        width: 48,
+                                        height: 48,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : const Icon(Icons.photo),
+                                title: Text('もんだい ${index + 1}'),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete_outline),
+                                  onPressed: () {
+                                    _confirmRemoveQuestion(context, index);
+                                  },
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: _tempQuestions.length >= maxImages
-                    ? null
-                    : _captureImageFromCamera,
-                child: Text(l10n.createCaptureAddDummy),
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: _tempQuestions.isEmpty
-                    ? null
-                    : () {
-                        Navigator.of(context).pushNamed(
-                          CreateQuizConfirmScreen.routeName,
-                          arguments: CreateQuizConfirmArguments(
-                            tempQuestions: List<QuizQuestion>.from(
-                              _tempQuestions,
-                            ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _tempQuestions.length >= maxImages
+                            ? null
+                            : _captureImageFromCamera,
+                        child: Text(l10n.createCaptureAddDummy),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _tempQuestions.isEmpty
+                            ? null
+                            : () {
+                                Navigator.of(context).pushNamed(
+                                  CreateQuizConfirmScreen.routeName,
+                                  arguments: CreateQuizConfirmArguments(
+                                    tempQuestions: List<QuizQuestion>.from(
+                                      _tempQuestions,
+                                    ),
+                                  ),
+                                );
+                              },
+                        child: Text(l10n.createCaptureFinish),
+                      ),
+                      if (_tempQuestions.length >= maxImages)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            l10n.createCaptureLimitMessage,
+                            style: const TextStyle(color: Colors.red),
                           ),
-                        );
-                      },
-                child: Text(l10n.createCaptureFinish),
-              ),
-              if (_tempQuestions.length >= maxImages)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    l10n.createCaptureLimitMessage,
-                    style: const TextStyle(color: Colors.red),
+                        ),
+                    ],
                   ),
                 ),
-            ],
-          ),
+              ),
+            const CornerBackButton(),
+          ],
         ),
       ),
     );

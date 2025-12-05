@@ -7,6 +7,7 @@ import '../models/quiz_models.dart';
 import '../services/silhouette_service.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
+import '../widgets/corner_back_button.dart';
 
 class PlayQuizArguments {
   final String quizSetId;
@@ -48,11 +49,25 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
 
     if (quizSet == null || quizSet.questions.isEmpty) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.playQuizTitle),
-        ),
-        body: const Center(
-          child: Text('クイズが みつかりません'),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/backgrounds/background_quiz.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+            SafeArea(
+              child: Stack(
+                children: const [
+                  Center(
+                    child: Text('クイズが みつかりません'),
+                  ),
+                  CornerBackButton(),
+                ],
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -61,108 +76,122 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
     final bool isLast = _currentIndex == quizSet.questions.length - 1;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(quizSet.title),
-      ),
-      body: CenteredLayout(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // 何問目か
-              Text(
-                '${_currentIndex + 1} / ${quizSet.questions.length}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: Center(
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: _buildQuestionVisual(
-                      question,
-                      showOriginalImage: _showAnswer,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_showAnswer)
-                Column(
-                  children: [
-                    Text(
-                      l10n.playQuizAnswerLabel,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // デフォルトクイズには answerText が入っている想定
-                    // 自作クイズはとりあえず「（こたえは じぶんたちで おはなし）」などでもOK
-                    Text(
-                      question.answerText ?? 'こたえは じぶんたちで おはなししてね！',
-                    ),
-                    const SizedBox(height: 16),
-                    // セルフ○×ボタン
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/backgrounds/background_quiz.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          SafeArea(
+            child: Stack(
+              children: [
+                CenteredLayout(
+                  backgroundColor: Colors.transparent,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
                       children: [
-                        ElevatedButton(
-                          onPressed: _hasAnsweredCurrent
-                              ? null
-                              : () => _onSelfJudge(isCorrect: true),
-                          child: Text(l10n.playQuizCorrect),
+                        Text(
+                          '${_currentIndex + 1} / ${quizSet.questions.length}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        ElevatedButton(
-                          onPressed: _hasAnsweredCurrent
-                              ? null
-                              : () => _onSelfJudge(isCorrect: false),
-                          child: Text(l10n.playQuizIncorrect),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          child: Center(
+                            child: AspectRatio(
+                              aspectRatio: 1,
+                              child: _buildQuestionVisual(
+                                question,
+                                showOriginalImage: _showAnswer,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        if (_showAnswer)
+                          Column(
+                            children: [
+                              Text(
+                                l10n.playQuizAnswerLabel,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                question.answerText ??
+                                    'こたえは じぶんたちで おはなししてね！',
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: _hasAnsweredCurrent
+                                        ? null
+                                        : () => _onSelfJudge(isCorrect: true),
+                                    child: Text(l10n.playQuizCorrect),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: _hasAnsweredCurrent
+                                        ? null
+                                        : () => _onSelfJudge(isCorrect: false),
+                                    child: Text(l10n.playQuizIncorrect),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: _showAnswer
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        _showAnswer = true;
+                                        _hasAnsweredCurrent = false;
+                                      });
+                                    },
+                              child: Text(l10n.playQuizShowAnswer),
+                            ),
+                            ElevatedButton(
+                              onPressed: (!_hasAnsweredCurrent)
+                                  ? null
+                                  : () {
+                                      if (isLast) {
+                                        _finishQuiz(context, quizSet);
+                                      } else {
+                                        setState(() {
+                                          _currentIndex++;
+                                          _showAnswer = false;
+                                          _hasAnsweredCurrent = false;
+                                        });
+                                      }
+                                    },
+                              child: Text(
+                                isLast
+                                    ? l10n.playQuizFinish
+                                    : l10n.playQuizNext,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              const SizedBox(height: 16),
-              // 操作ボタン列
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: _showAnswer
-                        ? null
-                        : () {
-                            setState(() {
-                              _showAnswer = true;
-                              _hasAnsweredCurrent = false;
-                            });
-                          },
-                    child: Text(l10n.playQuizShowAnswer),
-                  ),
-                  ElevatedButton(
-                    onPressed: (!_hasAnsweredCurrent)
-                        ? null
-                        : () {
-                            if (isLast) {
-                              _finishQuiz(context, quizSet);
-                            } else {
-                              setState(() {
-                                _currentIndex++;
-                                _showAnswer = false;
-                                _hasAnsweredCurrent = false;
-                              });
-                            }
-                          },
-                    child:
-                        Text(isLast ? l10n.playQuizFinish : l10n.playQuizNext),
-                  ),
-                ],
-              ),
-            ],
+                const CornerBackButton(),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -183,8 +212,15 @@ class _PlayQuizScreenState extends State<PlayQuizScreen> {
       path = question.originalImagePath;
     }
 
-    final bool hasFile =
-        path != null && path.isNotEmpty && File(path).existsSync();
+    bool hasFile = false;
+    if (path != null && path.isNotEmpty) {
+      try {
+        hasFile = File(path).existsSync();
+      } catch (e) {
+        // パスが無効な場合などはファイルなしとみなす
+        hasFile = false;
+      }
+    }
 
     if (hasFile) {
       final File file = File(path!);
