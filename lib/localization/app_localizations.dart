@@ -59,6 +59,8 @@ class AppLocalizations {
       'create_confirm_default_title': 'クイズ{number}',
       'create_confirm_save_button': 'これでOK！',
       'create_confirm_back_button': 'もどる',
+      'create_confirm_complete_title': 'かんせい！',
+      'create_confirm_complete_message': 'クイズの じゅんびが できたよ！',
 
       // Play quiz
       'play_quiz_title': 'クイズ',
@@ -134,6 +136,10 @@ class AppLocalizations {
   String get createConfirmTitleLabel => _translate('create_confirm_title_label');
   String get createConfirmSaveButton => _translate('create_confirm_save_button');
   String get createConfirmBackButton => _translate('create_confirm_back_button');
+  String get createConfirmCompleteTitle =>
+      _translate('create_confirm_complete_title');
+  String get createConfirmCompleteMessage =>
+      _translate('create_confirm_complete_message');
   String createConfirmDefaultTitle(int number) {
     String template = _translate('create_confirm_default_title');
     if (template == 'create_confirm_default_title') {

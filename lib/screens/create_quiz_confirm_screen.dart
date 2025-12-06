@@ -4,9 +4,9 @@ import '../localization/app_localizations.dart';
 import '../models/quiz_models.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
-import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/puni_button.dart';
+import '../widgets/factory_dialog.dart';
 import 'challenge_screen.dart';
 
 class CreateQuizConfirmArguments {
@@ -192,8 +192,13 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                           const SizedBox(height: 16),
                           TextField(
                             controller: _titleController,
+                            maxLength: 20,
                             decoration: InputDecoration(
                               labelText: l10n.createConfirmTitleLabel,
+                              counterText: '', // Hide default counter or keep it? User didn't specify, but usually counter is good.
+                              // Actually user just said "set max length". Default counter shows "0/20". That's fine.
+                              // Wait, "counterText: ''" hides it. I'll NOT hide it so user sees the limit.
+                              // But I will remove the explicit comment about hiding it.
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.8),
                               border: OutlineInputBorder(
@@ -213,7 +218,7 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
-                                    color: Colors.blueGrey,
+                                    color: PuniButtonColors.blueGrey,
                                     child: Text(
                                       l10n.createConfirmBackButton,
                                       style: const TextStyle(fontSize: 14),
@@ -226,7 +231,7 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                   child: PuniButton(
-                                    color: Colors.pink,
+                                    color: PuniButtonColors.pink,
                                     onPressed: _isSaving
                                         ? null
                                         : () async {
@@ -249,22 +254,55 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                             });
 
                                             try {
-                                              // Start Exit Animations
-                                              _conveyorShakeController.repeat(
-                                                  reverse: true);
+                                              _conveyorShakeController
+                                                  .repeat(reverse: true);
                                               _boxSlideController.forward();
 
-                                              // Run Save and Timer in Parallel
-                                              // This ensures we wait exactly 2 seconds unless saving is huge,
-                                              // but prevents "2s wait + Save Time" accumulation.
                                               await Future.wait([
                                                 Future.delayed(
                                                     const Duration(seconds: 2)),
                                                 appState.addCustomQuizSet(
                                                   title: title,
-                                                  questions: widget.tempQuestions,
+                                                  questions:
+                                                      widget.tempQuestions,
                                                 ),
                                               ]);
+
+                                              if (!mounted) {
+                                                return;
+                                              }
+                                              _conveyorShakeController.stop();
+                                              _conveyorShakeController.reset();
+
+                                              await showDialog<void>(
+                                                context: context,
+                                                barrierDismissible: false,
+                                                builder: (dialogContext) {
+                                                  return FactoryDialog(
+                                                    title: l10n
+                                                        .createConfirmCompleteTitle,
+                                                    message: l10n
+                                                        .createConfirmCompleteMessage,
+                                                    icon: const Icon(
+                                                      Icons.check_circle,
+                                                      color: Color(0xFF61C178),
+                                                      size: 56,
+                                                    ),
+                                                    actions: [
+                                                      PuniButton(
+                                                        text: l10n.commonOk,
+                                                        color:
+                                                            PuniButtonColors.pink,
+                                                        onPressed: () {
+                                                          Navigator.of(
+                                                                  dialogContext)
+                                                              .pop();
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
 
                                               if (!mounted) return;
 

@@ -15,7 +15,6 @@ class FactoryPlateCard extends StatelessWidget {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      // "Very light grey"
       color: Colors.grey[100],
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
       child: InkWell(
@@ -23,31 +22,26 @@ class FactoryPlateCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Stack(
           children: [
-            // Content with padding to avoid overlapping screws
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
               child: child,
             ),
-            // Screws (Rivets)
-            // Top Left
             const Positioned(
               top: 4,
               left: 4,
               child: _Screw(),
             ),
-            // Top Right
             const Positioned(
               top: 4,
               right: 4,
               child: _Screw(),
             ),
-            // Bottom Left
             const Positioned(
               bottom: 4,
               left: 4,
               child: _Screw(),
             ),
-            // Bottom Right
             const Positioned(
               bottom: 4,
               right: 4,

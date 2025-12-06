@@ -8,9 +8,9 @@ import '../models/quiz_models.dart';
 import '../services/silhouette_service.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
-import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/puni_button.dart';
+import '../widgets/factory_dialog.dart';
 
 class PlayQuizArguments {
   final String quizSetId;
@@ -42,6 +42,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
   final Set<int> _revealedIndices = {}; // Indices where answer is shown
   final Set<int> _answeredIndices = {}; // Indices where user answered (buttons disabled)
   int _correctCount = 0;
+  bool _markedViewed = false;
 
   late PageController _pageController;
   late AnimationController _initialSlideController;
@@ -87,6 +88,14 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     if (quizSet != null && quizSet.questions.isNotEmpty) {
       _questions = List<QuizQuestion>.from(quizSet.questions)..shuffle();
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final QuizSet? set = appState.findQuizSetById(widget.quizSetId);
+      if (!_markedViewed && set != null && set.isCustom) {
+        appState.markQuizAsViewed(set.id);
+        _markedViewed = true;
+      }
+    });
   }
 
   @override
@@ -96,6 +105,8 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     _conveyorController.dispose();
     super.dispose();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -248,7 +259,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                     constraints: const BoxConstraints(maxWidth: 240),
                                     child: PuniButton(
                                       text: l10n.playQuizShowAnswer,
-                                      color: Colors.green,
+                                      color: PuniButtonColors.green,
                                       onPressed: () {
                                         setState(() {
                                           _revealedIndices.add(_currentIndex);
@@ -266,7 +277,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                         child: PuniButton(
                                           text: l10n.playQuizCorrect,
-                                          color: Colors.pink,
+                                          color: PuniButtonColors.pink,
                                           onPressed: () => _onSelfJudge(
                                             context,
                                             isCorrect: true,
@@ -279,7 +290,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                         child: PuniButton(
                                           text: l10n.playQuizIncorrect,
-                                          color: Colors.blueGrey,
+                                          color: PuniButtonColors.blueGrey,
                                           onPressed: () => _onSelfJudge(
                                             context,
                                             isCorrect: false,
@@ -452,17 +463,24 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
 
     showDialog<void>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(l10n.playQuizResultTitle),
-          content: Text(message),
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return FactoryDialog(
+          title: l10n.playQuizResultTitle,
+          message: message,
+          icon: const Icon(
+            Icons.emoji_events,
+            color: Color(0xFFFFC746),
+            size: 56,
+          ),
           actions: [
-            TextButton(
+            PuniButton(
+              text: l10n.commonOk,
+              color: PuniButtonColors.pink,
               onPressed: () {
-                Navigator.of(context).pop(); // ダイアログ閉じる
-                Navigator.of(context).pop(); // クイズ画面を閉じる
+                Navigator.of(dialogContext).pop();
+                Navigator.of(context).pop();
               },
-              child: Text(l10n.commonOk),
             ),
           ],
         );

@@ -7,10 +7,13 @@ import '../services/silhouette_service.dart';
 
 class QuizAppState extends ChangeNotifier {
   static const String customQuizBoxName = 'custom_quiz_sets';
+  static const String newQuizzesKey = 'new_custom_quiz_ids';
 
   late Box<QuizSet> _customQuizBox;
 
   final List<QuizSet> _defaultQuizSets = <QuizSet>[];
+
+  late Box<List> _metaBox;
 
   final PurchaseService purchaseService = PurchaseService();
   final SilhouetteService silhouetteService = SilhouetteService();
@@ -24,6 +27,7 @@ class QuizAppState extends ChangeNotifier {
 
   Future<void> initialize() async {
     _customQuizBox = await Hive.openBox<QuizSet>(customQuizBoxName);
+    _metaBox = await Hive.openBox<List>('quiz_meta');
     await purchaseService.loadPurchaseState();
     await silhouetteService.initialize();
     _loadDefaultQuizzes();
@@ -126,11 +130,13 @@ class QuizAppState extends ChangeNotifier {
       questions: List<QuizQuestion>.from(questions),
     );
     await _customQuizBox.put(set.id, set);
+    _addNewQuizId(set.id);
     notifyListeners();
   }
 
   Future<void> deleteCustomQuizSet(String id) async {
     await _customQuizBox.delete(id);
+    _removeNewQuizId(id);
     notifyListeners();
   }
 
@@ -148,8 +154,34 @@ class QuizAppState extends ChangeNotifier {
     }
     // Hive box lookup
     if (_customQuizBox.containsKey(id)) {
-        return _customQuizBox.get(id);
+      return _customQuizBox.get(id);
     }
     return null;
+  }
+
+  List<String> get newQuizIds {
+    final List? raw = _metaBox.get(newQuizzesKey);
+    if (raw == null) return [];
+    return raw.cast<String>();
+  }
+
+  void markQuizAsViewed(String id) {
+    _removeNewQuizId(id);
+    notifyListeners();
+  }
+
+  void _addNewQuizId(String id) {
+    final List<String> ids = newQuizIds;
+    if (!ids.contains(id)) {
+      ids.add(id);
+      _metaBox.put(newQuizzesKey, ids);
+    }
+  }
+
+  void _removeNewQuizId(String id) {
+    final List<String> ids = newQuizIds;
+    if (ids.remove(id)) {
+      _metaBox.put(newQuizzesKey, ids);
+    }
   }
 }

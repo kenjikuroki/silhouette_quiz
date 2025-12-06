@@ -21,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   static const Alignment _initialAlignment = Alignment(0, -5);
   static const Alignment _dropAlignment = Alignment(0, -0.1);
 
@@ -29,6 +29,8 @@ class _HomeScreenState extends State<HomeScreen>
   bool _hasChangedCharacter = false;
   Alignment _characterAlignment = _initialAlignment;
   late final AnimationController _shakeController;
+  late final AnimationController _swayController;
+  late final Animation<double> _swayAnimation;
   bool _isChangingCharacter = false;
   bool _shouldAnimateCharacter = false;
   bool _isChallengePressed = false;
@@ -48,11 +50,19 @@ class _HomeScreenState extends State<HomeScreen>
       vsync: this,
       duration: const Duration(milliseconds: 250),
     );
+
+    _swayController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2000));
+    _swayAnimation = Tween<double>(begin: -0.02, end: 0.02).animate(
+      CurvedAnimation(parent: _swayController, curve: Curves.easeInOut),
+    );
+    _swayController.repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _shakeController.dispose();
+    _swayController.dispose();
     super.dispose();
   }
 
@@ -216,20 +226,24 @@ class _HomeScreenState extends State<HomeScreen>
                 alignment: _characterAlignment,
                 child: GestureDetector(
                   onTap: _changeCharacter,
-                  child: AnimatedBuilder(
-                    animation: _shakeController,
-                    builder: (context, child) {
-                      final double dx =
-                          sin(_shakeController.value * 2 * pi) * 8;
-                      return Transform.translate(
-                        offset: Offset(dx, 0),
-                        child: child,
-                      );
-                    },
-                    child: Image.asset(
-                      _currentCharacterImage,
-                      width: w * 0.5, // 0.635 -> 0.5 に縮小
-                      fit: BoxFit.contain,
+                  child: RotationTransition(
+                    turns: _swayAnimation,
+                    alignment: Alignment.bottomCenter,
+                    child: AnimatedBuilder(
+                      animation: _shakeController,
+                      builder: (context, child) {
+                        final double dx =
+                            sin(_shakeController.value * 2 * pi) * 8;
+                        return Transform.translate(
+                          offset: Offset(dx, 0),
+                          child: child,
+                        );
+                      },
+                      child: Image.asset(
+                        _currentCharacterImage,
+                        width: w * 0.5, // 0.635 -> 0.5 に縮小
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ),

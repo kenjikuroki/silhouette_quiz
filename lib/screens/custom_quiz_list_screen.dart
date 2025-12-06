@@ -6,6 +6,8 @@ import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/factory_plate_card.dart';
+import '../widgets/factory_dialog.dart';
+import '../widgets/puni_button.dart';
 import 'play_quiz_screen.dart';
 
 class CustomQuizListScreen extends StatelessWidget {
@@ -42,24 +44,31 @@ class CustomQuizListScreen extends StatelessWidget {
                     itemCount: customSets.length,
                     itemBuilder: (context, index) {
                       final QuizSet set = customSets[index];
+                      final bool isNew =
+                          appState.newQuizIds.contains(set.id);
                       return FactoryPlateCard(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(
-                          PlayQuizScreen.routeName,
-                          arguments: PlayQuizArguments(quizSetId: set.id),
-                        );
-                      },
-                      child: ListTile(
-                        title: Text(set.title),
-                        subtitle: Text('${set.questions.length} もん'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () {
-                            _confirmDelete(context, set.id);
-                          },
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                            PlayQuizScreen.routeName,
+                            arguments: PlayQuizArguments(quizSetId: set.id),
+                          );
+                        },
+                        child: ListTile(
+                          title: Row(
+                            children: [
+                              Expanded(child: Text(set.title)),
+                              if (isNew) const _NewBadge(),
+                            ],
+                          ),
+                          subtitle: Text('${set.questions.length} もん'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              _confirmDelete(context, set.id);
+                            },
+                          ),
                         ),
-                      ),
-                    );
+                      );
                     },
                   ),
                 ),
@@ -76,18 +85,20 @@ class CustomQuizListScreen extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final bool? result = await showDialog<bool>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(l10n.deleteQuizConfirmTitle),
-          content: Text(l10n.deleteQuizConfirmMessage),
+      builder: (dialogContext) {
+        return FactoryDialog(
+          title: l10n.deleteQuizConfirmTitle,
+          message: l10n.deleteQuizConfirmMessage,
           actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.commonCancel),
+            PuniButton(
+              text: l10n.commonCancel,
+              color: PuniButtonColors.blueGrey,
+              onPressed: () => Navigator.of(dialogContext).pop(false),
             ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(l10n.commonDelete),
+            PuniButton(
+              text: l10n.commonDelete,
+              color: PuniButtonColors.pink,
+              onPressed: () => Navigator.of(dialogContext).pop(true),
             ),
           ],
         );
@@ -97,5 +108,28 @@ class CustomQuizListScreen extends StatelessWidget {
     if (result == true) {
       appState.deleteCustomQuizSet(id);
     }
+  }
+}
+
+class _NewBadge extends StatelessWidget {
+  const _NewBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: PuniButtonColors.pink,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Text(
+        'NEW',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    );
   }
 }

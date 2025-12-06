@@ -9,6 +9,7 @@ import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/puni_button.dart';
+import '../widgets/factory_dialog.dart';
 import 'create_quiz_confirm_screen.dart';
 
 class CreateQuizCaptureScreen extends StatefulWidget {
@@ -130,7 +131,7 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                                     ),
                                   PuniButton(
                                     text: 'しゃしんをとる',
-                                    color: const Color(0xFF61C178),
+                                    color: PuniButtonColors.green,
                                     onPressed: _tempQuestions.length >= maxImages
                                         ? null
                                         : _captureImageFromCamera,
@@ -138,7 +139,7 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                                   const SizedBox(height: 16),
                                   PuniButton(
                                     text: l10n.createCaptureFinish,
-                                    color: const Color(0xFFFF7DA0),
+                                    color: PuniButtonColors.pink,
                                     onPressed: _tempQuestions.isEmpty
                                         ? null
                                         : () {
@@ -208,18 +209,20 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
 
     final bool? result = await showDialog<bool>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(l10n.captureDeleteTitle),
-          content: Text(l10n.captureDeleteMessage),
+      builder: (dialogContext) {
+        return FactoryDialog(
+          title: l10n.captureDeleteTitle,
+          message: l10n.captureDeleteMessage,
           actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.commonCancel),
+            PuniButton(
+              text: l10n.commonCancel,
+              color: PuniButtonColors.blueGrey,
+              onPressed: () => Navigator.of(dialogContext).pop(false),
             ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(l10n.captureDeleteOk),
+            PuniButton(
+              text: l10n.captureDeleteOk,
+              color: PuniButtonColors.pink,
+              onPressed: () => Navigator.of(dialogContext).pop(true),
             ),
           ],
         );

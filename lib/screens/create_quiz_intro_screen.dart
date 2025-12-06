@@ -61,7 +61,7 @@ class CreateQuizIntroScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 48),
                           child: PuniButton(
                             text: l10n.createIntroStartButton,
-                            color: const Color(0xFF61C178),
+                            color: PuniButtonColors.green,
                             onPressed: () async {
                               final bool canCreate =
                                   await appState.ensureCanCreateCustomQuizSet();

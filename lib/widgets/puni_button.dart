@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+class PuniButtonColors {
+  static const Color pink = Color(0xFFFF7DA0);
+  static const Color green = Color(0xFF61C178);
+  static const Color blueGrey = Color(0xFF6F7FA8);
+}
+
 class PuniButton extends StatelessWidget {
   final String? text;
   final Widget? child;
@@ -15,7 +21,7 @@ class PuniButton extends StatelessWidget {
     this.text,
     this.child,
     required this.onPressed,
-    this.color = const Color(0xFFEE4E8B),
+    this.color = PuniButtonColors.pink,
     this.textColor = Colors.white,
     this.padding = const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
     this.borderRadius = 30,
