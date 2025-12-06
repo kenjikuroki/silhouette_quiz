@@ -20,6 +20,7 @@ dependencies:
 
   # ★ 追加：カメラ・ギャラリーから画像を取る
   image_picker: ^1.0.7
+  google_fonts: ^6.1.0
 
   # Hive
   hive: ^2.2.3
@@ -50,3 +51,6 @@ flutter:
 
     - assets/images/button/
     - assets/images/conveyor.png
+    - assets/images/conveyor_y.png
+    - assets/images/box.png
+    - assets/images/piping.png

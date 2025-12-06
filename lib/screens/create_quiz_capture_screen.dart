@@ -56,7 +56,7 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        Text(l10n.createCaptureCount(_tempQuestions.length)),
+                      Text(l10n.createCaptureCount(_tempQuestions.length)),
                         const SizedBox(height: 16),
                         Expanded(
                           child: ListView.builder(
@@ -90,15 +90,15 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                         const SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: _tempQuestions.length >= maxImages
-                              ? null
-                              : _captureImageFromCamera,
+                            ? null
+                            : _captureImageFromCamera,
                           child: Text(l10n.createCaptureAddDummy),
                         ),
                         const SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: _tempQuestions.isEmpty
-                              ? null
-                              : () {
+                            ? null
+                            : () {
                                   Navigator.of(context).pushNamed(
                                     CreateQuizConfirmScreen.routeName,
                                     arguments: CreateQuizConfirmArguments(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'localization/app_localizations.dart';
 import 'state/quiz_app_state.dart';
@@ -28,12 +29,38 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Define base text theme with M PLUS Rounded 1c w800 (ExtraBold) as requested
+    final baseTextTheme = GoogleFonts.mPlusRounded1cTextTheme(Theme.of(context).textTheme);
+    final mediumTextTheme = baseTextTheme.copyWith(
+      displayLarge: baseTextTheme.displayLarge?.copyWith(fontWeight: FontWeight.w800),
+      displayMedium: baseTextTheme.displayMedium?.copyWith(fontWeight: FontWeight.w800),
+      displaySmall: baseTextTheme.displaySmall?.copyWith(fontWeight: FontWeight.w800),
+      headlineLarge: baseTextTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w800),
+      headlineMedium: baseTextTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+      headlineSmall: baseTextTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+      titleLarge: baseTextTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+      titleMedium: baseTextTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+      titleSmall: baseTextTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+      bodyLarge: baseTextTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w800),
+      bodyMedium: baseTextTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w800),
+      bodySmall: baseTextTheme.bodySmall?.copyWith(fontWeight: FontWeight.w800),
+      labelLarge: baseTextTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800),
+      labelMedium: baseTextTheme.labelMedium?.copyWith(fontWeight: FontWeight.w800),
+      labelSmall: baseTextTheme.labelSmall?.copyWith(fontWeight: FontWeight.w800),
+    );
+
     return AnimatedBuilder(
       animation: appState,
       builder: (context, _) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Silhouette Quiz',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            textTheme: mediumTextTheme,
+            // Ensure implicit text widgets also get the font family if possible
+            fontFamily: GoogleFonts.mPlusRounded1c().fontFamily, 
+          ),
           locale: const Locale('ja'),
           supportedLocales: const [
             Locale('ja'),

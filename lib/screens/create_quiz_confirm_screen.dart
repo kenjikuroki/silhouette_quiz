@@ -32,15 +32,83 @@ class CreateQuizConfirmScreen extends StatefulWidget {
       _CreateQuizConfirmScreenState();
 }
 
-class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen> {
+class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
+    with TickerProviderStateMixin {
   final TextEditingController _titleController = TextEditingController();
   bool _defaultTitleApplied = false;
+  bool _isSaving = false;
+
+  late AnimationController _boxDropController;
+  late Animation<Offset> _boxDropAnimation;
+
+  late AnimationController _boxSlideController;
+  late Animation<Offset> _boxSlideAnimation;
+
+  late AnimationController _conveyorShakeController;
+  late Animation<Offset> _conveyorShakeAnimation;
 
   QuizAppState get appState => widget.appState;
 
   @override
+  void initState() {
+    super.initState();
+
+    // Box Drop: 1s
+    _boxDropController = AnimationController(
+       duration: const Duration(seconds: 1),
+       vsync: this,
+    );
+    _boxDropAnimation = TweenSequence<Offset>([
+      TweenSequenceItem(
+        tween: Tween<Offset>(begin: const Offset(0, -1.5), end: Offset.zero)
+            .chain(CurveTween(curve: Curves.easeIn)), // Fall
+        weight: 70,
+      ),
+      TweenSequenceItem(
+        tween: Tween<Offset>(begin: Offset.zero, end: const Offset(0, -0.05))
+            .chain(CurveTween(curve: Curves.easeOut)), // Small bounce up
+        weight: 15,
+      ),
+      TweenSequenceItem(
+        tween: Tween<Offset>(begin: const Offset(0, -0.05), end: Offset.zero)
+            .chain(CurveTween(curve: Curves.easeIn)), // Land back
+        weight: 15,
+      ),
+    ]).animate(_boxDropController);
+
+    // Box Slide (Exit): 2s
+    _boxSlideController = AnimationController(
+       duration: const Duration(seconds: 2),
+       vsync: this,
+    );
+    _boxSlideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(1.5, 0), // Slide off-screen right
+    ).animate(CurvedAnimation(
+      parent: _boxSlideController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Conveyor Shake: 0.1s (repeating)
+    _conveyorShakeController = AnimationController(
+       duration: const Duration(milliseconds: 100),
+       vsync: this,
+    );
+    _conveyorShakeAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, 0.05), // Small vertical shake
+    ).animate(_conveyorShakeController);
+
+    // Start drop animation immediately
+    _boxDropController.forward();
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
+    _boxDropController.dispose();
+    _boxSlideController.dispose();
+    _conveyorShakeController.dispose();
     super.dispose();
   }
 
@@ -58,61 +126,160 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen> {
     }
 
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            CenteredLayout(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        l10n.createConfirmMessage,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: _titleController,
-                        decoration: InputDecoration(
-                          labelText: l10n.createConfirmTitleLabel,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(l10n.createConfirmBackButton),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              final String title = _titleController.text.trim();
-                              if (title.isEmpty) {
-                                return;
-                              }
-                              appState.addCustomQuizSet(
-                                title: title,
-                                questions: widget.tempQuestions,
-                              );
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                ChallengeScreen.routeName,
-                                (route) => route.isFirst,
-                              );
-                            },
-                            child: Text(l10n.createConfirmSaveButton),
-                          ),
-                        ],
-                      ),
-                    ],
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/backgrounds/background_name.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Removed piping.png
+          Positioned(
+            bottom: -60,
+            left: 0,
+            right: 0,
+            child: SlideTransition(
+              position: _conveyorShakeAnimation,
+              child: Image.asset(
+                'assets/images/conveyor_y.png',
+                fit: BoxFit.fitWidth,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -50,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: SlideTransition(
+                position: _boxSlideAnimation, // Apply slide right AFTER drop
+                child: SlideTransition(
+                  position: _boxDropAnimation, // Apply drop
+                  child: Image.asset(
+                    'assets/images/box.png',
+                    width: MediaQuery.of(context).size.width * 0.95,
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
-            const CornerBackButton(),
-          ],
-        ),
+            ),
+          ),
+          SafeArea(
+            child: Stack(
+              children: [
+                CenteredLayout(
+                  backgroundColor: Colors.transparent,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Text(
+                          l10n.createConfirmMessage,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _titleController,
+                          decoration: InputDecoration(
+                            labelText: l10n.createConfirmTitleLabel,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(l10n.createConfirmBackButton),
+                            ),
+                            ElevatedButton(
+                              onPressed: _isSaving
+                                  ? null
+                                  : () async {
+                                      final String title =
+                                          _titleController.text.trim();
+                                      if (title.isEmpty) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                l10n.createConfirmTitleLabel), // Use label as error or custom string
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                        return;
+                                      }
+
+                                      setState(() {
+                                        _isSaving = true;
+                                      });
+
+                                      try {
+                                        // Start Exit Animations
+                                        _conveyorShakeController.repeat(
+                                            reverse: true);
+                                        _boxSlideController.forward();
+
+                                        // Run Save and Timer in Parallel
+                                        // This ensures we wait exactly 2 seconds unless saving is huge,
+                                        // but prevents "2s wait + Save Time" accumulation.
+                                        await Future.wait([
+                                          Future.delayed(
+                                              const Duration(seconds: 2)),
+                                          appState.addCustomQuizSet(
+                                            title: title,
+                                            questions: widget.tempQuestions,
+                                          ),
+                                        ]);
+
+                                        if (!mounted) return;
+
+                                        Navigator.of(context)
+                                            .pushNamedAndRemoveUntil(
+                                          ChallengeScreen.routeName,
+                                          (route) => route.isFirst,
+                                        );
+                                      } catch (e) {
+                                        debugPrint('Error saving quiz: $e');
+                                        if (mounted) {
+                                          setState(() {
+                                            _isSaving = false;
+                                          });
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text('Error: $e'),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    },
+                              child: _isSaving
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(l10n.createConfirmSaveButton),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const CornerBackButton(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
