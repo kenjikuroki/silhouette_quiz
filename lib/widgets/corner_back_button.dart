@@ -23,13 +23,7 @@ class CornerBackButton extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              // "Ku-shaped" (chevron) arrow, thick and easy to see.
-              // Icons.arrow_back_ios_new is thicker than arrow_back_ios.
-              // Added padding to visually center it in the circle.
-              icon: const Padding(
-                padding: EdgeInsets.only(left: 4),
-                child: Icon(Icons.arrow_back_ios_new),
-              ), 
+              icon: const Icon(Icons.arrow_back_ios_new),
               color: color == Colors.black ? Colors.black87 : color,
               onPressed: onPressed ?? () {
                 if (Navigator.of(context).canPop()) {

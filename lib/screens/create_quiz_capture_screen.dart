@@ -66,15 +66,21 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                                 child: ListView.builder(
                                   itemCount: _tempQuestions.length,
                                   itemBuilder: (context, index) {
-                                    final QuizQuestion question = _tempQuestions[index];
+                                    final QuizQuestion question =
+                                        _tempQuestions[index];
                                     return Card(
                                       child: ListTile(
-                                        contentPadding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                                        leading: (question.originalImagePath != null &&
-                                                File(question.originalImagePath!)
+                                        contentPadding:
+                                            const EdgeInsets.fromLTRB(
+                                                16, 0, 0, 0),
+                                        leading: (question.originalImagePath !=
+                                                    null &&
+                                                File(question
+                                                        .originalImagePath!)
                                                     .existsSync())
                                             ? Image.file(
-                                                File(question.originalImagePath!),
+                                                File(question
+                                                    .originalImagePath!),
                                                 width: 48,
                                                 height: 48,
                                                 fit: BoxFit.cover,
@@ -84,9 +90,13 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                                         trailing: IconButton(
                                           icon: const Icon(Icons.close),
                                           onPressed: () {
-                                            _confirmRemoveQuestion(context, index);
+                                            _confirmRemoveQuestion(
+                                                context, index);
                                           },
                                         ),
+                                        onTap: () {
+                                          _showPreview(context, question);
+                                        },
                                       ),
                                     );
                                   },
@@ -227,5 +237,32 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
     setState(() {
       _tempQuestions.removeAt(index);
     });
+  }
+
+  void _showPreview(BuildContext context, QuizQuestion question) {
+    final String? path = question.silhouetteImagePath;
+    final bool hasFile =
+        path != null && path.isNotEmpty && File(path).existsSync();
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          content: hasFile
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    File(path!),
+                    fit: BoxFit.contain,
+                  ),
+                )
+              : const SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Center(child: Text('シルエットがありません')),
+                ),
+        );
+      },
+    );
   }
 }

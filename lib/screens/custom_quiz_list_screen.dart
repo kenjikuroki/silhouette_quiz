@@ -53,7 +53,7 @@ class CustomQuizListScreen extends StatelessWidget {
                         title: Text(set.title),
                         subtitle: Text('${set.questions.length} もん'),
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
+                          icon: const Icon(Icons.close),
                           onPressed: () {
                             _confirmDelete(context, set.id);
                           },

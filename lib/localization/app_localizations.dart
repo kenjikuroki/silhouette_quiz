@@ -27,7 +27,7 @@ class AppLocalizations {
       // Challenge
       'challenge_title': 'チャレンジする',
       'challenge_default_section_title': 'みんなのクイズ',
-      'challenge_custom_section_title': 'きみがつくったクイズ',
+      'challenge_custom_section_title': 'つくったクイズ',
       'challenge_more_button': 'もっとみる',
 
       // Categories (default)
@@ -37,7 +37,7 @@ class AppLocalizations {
       'category_home': 'おうちのなかクイズ',
 
       // Custom list
-      'custom_list_title': 'きみがつくったクイズ',
+      'custom_list_title': 'つくったクイズ',
       'custom_list_empty': 'まだ じぶんのクイズは ありません',
 
       // Create flow
@@ -50,7 +50,7 @@ class AppLocalizations {
       'create_capture_count': 'いま {count} まい',
       'create_capture_finish': 'かんりょう',
       'create_capture_limit_message': 'これいじょう は とれません（5まい まで）',
-      'capture_delete_title': 'この もんだいを けす？',
+      'capture_delete_title': 'このクイズを けす？',
       'capture_delete_message': 'あとから もどせないよ。',
       'capture_delete_ok': 'けす',
       'create_confirm_title': 'これで いい？',
