@@ -174,25 +174,43 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        Text(
-                          l10n.createConfirmMessage,
-                          textAlign: TextAlign.center,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            l10n.createConfirmMessage,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         TextField(
                           controller: _titleController,
                           decoration: InputDecoration(
                             labelText: l10n.createConfirmTitleLabel,
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.8),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            TextButton(
+                            ElevatedButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blueGrey,
+                                foregroundColor: Colors.white,
+                              ),
                               child: Text(l10n.createConfirmBackButton),
                             ),
                             ElevatedButton(
@@ -258,6 +276,10 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                         }
                                       }
                                     },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.pink,
+                                foregroundColor: Colors.white,
+                              ),
                               child: _isSaving
                                   ? const SizedBox(
                                       width: 24,

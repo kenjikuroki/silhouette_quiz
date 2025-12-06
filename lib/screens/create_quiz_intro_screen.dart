@@ -39,9 +39,21 @@ class CreateQuizIntroScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          l10n.createIntroMessage,
-                          textAlign: TextAlign.center,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            'しゃしんをとって じぶんだけの\nシルエットクイズを つくろう！\nさいだい５まい とれるよ',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(
@@ -55,6 +67,10 @@ class CreateQuizIntroScreen extends StatelessWidget {
                               CreateQuizCaptureScreen.routeName,
                             );
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
                           child: Text(l10n.createIntroStartButton),
                         ),
                       ],

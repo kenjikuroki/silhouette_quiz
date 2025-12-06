@@ -56,68 +56,103 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                      Text(l10n.createCaptureCount(_tempQuestions.length)),
-                        const SizedBox(height: 16),
                         Expanded(
-                          child: ListView.builder(
-                            itemCount: _tempQuestions.length,
-                            itemBuilder: (context, index) {
-                              final QuizQuestion question = _tempQuestions[index];
-                              return Card(
-                                child: ListTile(
-                                  leading: (question.originalImagePath != null &&
-                                          File(question.originalImagePath!)
-                                              .existsSync())
-                                      ? Image.file(
-                                          File(question.originalImagePath!),
-                                          width: 48,
-                                          height: 48,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : const Icon(Icons.photo),
-                                  title: Text('もんだい ${index + 1}'),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete_outline),
-                                    onPressed: () {
-                                      _confirmRemoveQuestion(context, index);
-                                    },
-                                  ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // List on the Left
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: _tempQuestions.length,
+                                  itemBuilder: (context, index) {
+                                    final QuizQuestion question = _tempQuestions[index];
+                                    return Card(
+                                      child: ListTile(
+                                        contentPadding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+                                        leading: (question.originalImagePath != null &&
+                                                File(question.originalImagePath!)
+                                                    .existsSync())
+                                            ? Image.file(
+                                                File(question.originalImagePath!),
+                                                width: 48,
+                                                height: 48,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : const Icon(Icons.photo),
+                                        title: Text('${index + 1}まいめ'),
+                                        trailing: IconButton(
+                                          icon: const Icon(Icons.close),
+                                          onPressed: () {
+                                            _confirmRemoveQuestion(context, index);
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: _tempQuestions.length >= maxImages
-                            ? null
-                            : _captureImageFromCamera,
-                          child: Text(l10n.createCaptureAddDummy),
-                        ),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: _tempQuestions.isEmpty
-                            ? null
-                            : () {
-                                  Navigator.of(context).pushNamed(
-                                    CreateQuizConfirmScreen.routeName,
-                                    arguments: CreateQuizConfirmArguments(
-                                      tempQuestions: List<QuizQuestion>.from(
-                                        _tempQuestions,
+                              ),
+                              const SizedBox(width: 16),
+                              // Buttons on the Right
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  if (_tempQuestions.length >= maxImages)
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 16),
+                                      child: SizedBox(
+                                        width: 120, // Constrain width to avoid pushing list
+                                        child: DecoratedBox(
+                                           decoration: BoxDecoration(
+                                             color: Color.fromRGBO(255, 255, 255, 0.8),
+                                             borderRadius: BorderRadius.all(Radius.circular(8)),
+                                           ),
+                                           child: Padding(
+                                             padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                             child: Text(
+                                               'さつえいは5まいまでだよ。',
+                                               style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold),
+                                               textAlign: TextAlign.center,
+                                             ),
+                                           ),
+                                        ),
                                       ),
                                     ),
-                                  );
-                                },
-                          child: Text(l10n.createCaptureFinish),
-                        ),
-                        if (_tempQuestions.length >= maxImages)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(
-                              l10n.createCaptureLimitMessage,
-                              style: const TextStyle(color: Colors.red),
-                            ),
+                                  ElevatedButton(
+                                    onPressed: _tempQuestions.length >= maxImages
+                                      ? null
+                                      : _captureImageFromCamera,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    child: const Text('しゃしんをとる'),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton(
+                                    onPressed: _tempQuestions.isEmpty
+                                      ? null
+                                      : () {
+                                            Navigator.of(context).pushNamed(
+                                              CreateQuizConfirmScreen.routeName,
+                                              arguments: CreateQuizConfirmArguments(
+                                                tempQuestions: List<QuizQuestion>.from(
+                                                  _tempQuestions,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.pink,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    child: Text(l10n.createCaptureFinish),
+                                  ),
+                                  const SizedBox(height: 80), // Added spacing to lift buttons
+                                ],
+                              ),
+                            ],
                           ),
+                        ),
                       ],
                     ),
                   ),
