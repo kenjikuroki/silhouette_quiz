@@ -8,6 +8,7 @@ import '../models/quiz_models.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
+import '../widgets/puni_button.dart';
 import 'create_quiz_confirm_screen.dart';
 
 class CreateQuizCaptureScreen extends StatefulWidget {
@@ -117,35 +118,30 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                                         ),
                                       ),
                                     ),
-                                  ElevatedButton(
+                                  PuniButton(
+                                    text: 'しゃしんをとる',
+                                    color: const Color(0xFF61C178),
                                     onPressed: _tempQuestions.length >= maxImages
-                                      ? null
-                                      : _captureImageFromCamera,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    child: const Text('しゃしんをとる'),
+                                        ? null
+                                        : _captureImageFromCamera,
                                   ),
                                   const SizedBox(height: 16),
-                                  ElevatedButton(
+                                  PuniButton(
+                                    text: l10n.createCaptureFinish,
+                                    color: const Color(0xFFFF7DA0),
                                     onPressed: _tempQuestions.isEmpty
-                                      ? null
-                                      : () {
+                                        ? null
+                                        : () {
                                             Navigator.of(context).pushNamed(
                                               CreateQuizConfirmScreen.routeName,
                                               arguments: CreateQuizConfirmArguments(
-                                                tempQuestions: List<QuizQuestion>.from(
+                                                tempQuestions:
+                                                    List<QuizQuestion>.from(
                                                   _tempQuestions,
                                                 ),
                                               ),
                                             );
                                           },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.pink,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    child: Text(l10n.createCaptureFinish),
                                   ),
                                   const SizedBox(height: 80), // Added spacing to lift buttons
                                 ],

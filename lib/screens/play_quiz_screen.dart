@@ -8,7 +8,9 @@ import '../models/quiz_models.dart';
 import '../services/silhouette_service.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
+import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
+import '../widgets/puni_button.dart';
 
 class PlayQuizArguments {
   final String quizSetId;
@@ -242,32 +244,48 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                           height: 80,
                           child: !_revealedIndices.contains(_currentIndex)
                               ? Center(
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _revealedIndices.add(_currentIndex);
-                                        _answeredIndices.remove(_currentIndex); // Ensure reset if revisiting? No, linear flow.
-                                      });
-                                    },
-                                    child: Text(l10n.playQuizShowAnswer),
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 240),
+                                    child: PuniButton(
+                                      text: l10n.playQuizShowAnswer,
+                                      color: Colors.green,
+                                      onPressed: () {
+                                        setState(() {
+                                          _revealedIndices.add(_currentIndex);
+                                          _answeredIndices.remove(_currentIndex);
+                                        });
+                                      },
+                                    ),
                                   ),
                                 )
                               : Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    ElevatedButton(
-                                      onPressed: () => _onSelfJudge(
-                                        context,
-                                        isCorrect: true,
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                        child: PuniButton(
+                                          text: l10n.playQuizCorrect,
+                                          color: Colors.pink,
+                                          onPressed: () => _onSelfJudge(
+                                            context,
+                                            isCorrect: true,
+                                          ),
+                                        ),
                                       ),
-                                      child: Text(l10n.playQuizCorrect),
                                     ),
-                                    ElevatedButton(
-                                      onPressed: () => _onSelfJudge(
-                                        context,
-                                        isCorrect: false,
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                        child: PuniButton(
+                                          text: l10n.playQuizIncorrect,
+                                          color: Colors.blueGrey,
+                                          onPressed: () => _onSelfJudge(
+                                            context,
+                                            isCorrect: false,
+                                          ),
+                                        ),
                                       ),
-                                      child: Text(l10n.playQuizIncorrect),
                                     ),
                                   ],
                                 ),
@@ -277,26 +295,32 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                   ),
                 ),
                 // Independent Answer Text Overlay
-                if (_revealedIndices.contains(_currentIndex))
-                  Positioned(
-                    top: 120, // Raised from 200
-                    right: 100, // Shift closer to center from 16
-                    child: Text(
-                      _questions[_currentIndex].answerText ?? '',
-                      style: const TextStyle(
-                        fontSize: 60, // Larger text
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 4,
-                            color: Colors.white,
-                            offset: Offset(0, 0),
-                          ),
-                        ],
-                      ),
-                    ),
+                Positioned(
+                  top: 100,
+                  left: 80,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    child: _revealedIndices.contains(_currentIndex)
+                        ? Container(
+                            key: ValueKey('answer_$_currentIndex'),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              _questions[_currentIndex].answerText ?? '',
+                              style: const TextStyle(
+                                fontSize: 48,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
+                ),
                 const CornerBackButton(),
               ],
             ),

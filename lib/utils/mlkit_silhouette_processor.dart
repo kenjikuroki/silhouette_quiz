@@ -99,6 +99,7 @@ class MLKitSilhouetteProcessor {
     img.Image silhouette = img.Image(
       width: maskImage.width,
       height: maskImage.height,
+      numChannels: 4,
     );
 
     for (int y = 0; y < maskImage.height; y++) {
@@ -109,8 +110,8 @@ class MLKitSilhouetteProcessor {
           // 被写体 → 黒
           silhouette.setPixelRgba(x, y, 0, 0, 0, 255);
         } else {
-          // 背景 → 白
-          silhouette.setPixelRgba(x, y, 255, 255, 255, 255);
+          // 背景 → 透明
+          silhouette.setPixelRgba(x, y, 0, 0, 0, 0);
         }
       }
     }
@@ -131,6 +132,7 @@ class MLKitSilhouetteProcessor {
     final img.Image silhouette = img.Image(
       width: originalImage.width,
       height: originalImage.height,
+      numChannels: 4,
     );
 
     for (int y = 0; y < originalImage.height; y++) {
@@ -140,7 +142,7 @@ class MLKitSilhouetteProcessor {
         if (luminance < 128) {
           silhouette.setPixelRgba(x, y, 0, 0, 0, 255);
         } else {
-          silhouette.setPixelRgba(x, y, 255, 255, 255, 255);
+          silhouette.setPixelRgba(x, y, 0, 0, 0, 0);
         }
       }
     }

@@ -4,7 +4,9 @@ import '../localization/app_localizations.dart';
 import '../models/quiz_models.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
+import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
+import '../widgets/puni_button.dart';
 import 'challenge_screen.dart';
 
 class CreateQuizConfirmArguments {
@@ -170,130 +172,141 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
               children: [
                 CenteredLayout(
                   backgroundColor: Colors.transparent,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            l10n.createConfirmMessage,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextField(
-                          controller: _titleController,
-                          decoration: InputDecoration(
-                            labelText: l10n.createConfirmTitleLabel,
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            border: OutlineInputBorder(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
                               borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide.none,
+                            ),
+                            child: Text(
+                              l10n.createConfirmMessage,
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blueGrey,
-                                foregroundColor: Colors.white,
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: _titleController,
+                            decoration: InputDecoration(
+                              labelText: l10n.createConfirmTitleLabel,
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.8),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide.none,
                               ),
-                              child: Text(l10n.createConfirmBackButton),
                             ),
-                            ElevatedButton(
-                              onPressed: _isSaving
-                                  ? null
-                                  : () async {
-                                      final String title =
-                                          _titleController.text.trim();
-                                      if (title.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                                l10n.createConfirmTitleLabel), // Use label as error or custom string
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                        return;
-                                      }
-
-                                      setState(() {
-                                        _isSaving = true;
-                                      });
-
-                                      try {
-                                        // Start Exit Animations
-                                        _conveyorShakeController.repeat(
-                                            reverse: true);
-                                        _boxSlideController.forward();
-
-                                        // Run Save and Timer in Parallel
-                                        // This ensures we wait exactly 2 seconds unless saving is huge,
-                                        // but prevents "2s wait + Save Time" accumulation.
-                                        await Future.wait([
-                                          Future.delayed(
-                                              const Duration(seconds: 2)),
-                                          appState.addCustomQuizSet(
-                                            title: title,
-                                            questions: widget.tempQuestions,
-                                          ),
-                                        ]);
-
-                                        if (!mounted) return;
-
-                                        Navigator.of(context)
-                                            .pushNamedAndRemoveUntil(
-                                          ChallengeScreen.routeName,
-                                          (route) => route.isFirst,
-                                        );
-                                      } catch (e) {
-                                        debugPrint('Error saving quiz: $e');
-                                        if (mounted) {
-                                          setState(() {
-                                            _isSaving = false;
-                                          });
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text('Error: $e'),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }
-                                      }
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: PuniButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
                                     },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.pink,
-                                foregroundColor: Colors.white,
+                                    color: Colors.blueGrey,
+                                    child: Text(
+                                      l10n.createConfirmBackButton,
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                    height: 48,
+                                  ),
+                                ),
                               ),
-                              child: _isSaving
-                                  ? const SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Text(l10n.createConfirmSaveButton),
-                            ),
-                          ],
-                        ),
-                      ],
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: PuniButton(
+                                    color: Colors.pink,
+                                    onPressed: _isSaving
+                                        ? null
+                                        : () async {
+                                            final String title =
+                                                _titleController.text.trim();
+                                            if (title.isEmpty) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      l10n.createConfirmTitleLabel), // Use label as error or custom string
+                                                  backgroundColor: Colors.red,
+                                                ),
+                                              );
+                                              return;
+                                            }
+
+                                            setState(() {
+                                              _isSaving = true;
+                                            });
+
+                                            try {
+                                              // Start Exit Animations
+                                              _conveyorShakeController.repeat(
+                                                  reverse: true);
+                                              _boxSlideController.forward();
+
+                                              // Run Save and Timer in Parallel
+                                              // This ensures we wait exactly 2 seconds unless saving is huge,
+                                              // but prevents "2s wait + Save Time" accumulation.
+                                              await Future.wait([
+                                                Future.delayed(
+                                                    const Duration(seconds: 2)),
+                                                appState.addCustomQuizSet(
+                                                  title: title,
+                                                  questions: widget.tempQuestions,
+                                                ),
+                                              ]);
+
+                                              if (!mounted) return;
+
+                                              Navigator.of(context)
+                                                  .pushNamedAndRemoveUntil(
+                                                ChallengeScreen.routeName,
+                                                (route) => route.isFirst,
+                                              );
+                                            } catch (e) {
+                                              debugPrint('Error saving quiz: $e');
+                                              if (mounted) {
+                                                setState(() {
+                                                  _isSaving = false;
+                                                });
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('Error: $e'),
+                                                    backgroundColor: Colors.red,
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          },
+                                    height: 48,
+                                    child: _isSaving
+                                        ? const SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : Text(l10n.createConfirmSaveButton, style: const TextStyle(fontSize: 16)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

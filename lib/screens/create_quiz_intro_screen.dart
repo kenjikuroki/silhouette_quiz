@@ -4,6 +4,7 @@ import '../localization/app_localizations.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
+import '../widgets/puni_button.dart';
 import 'create_quiz_capture_screen.dart';
 
 class CreateQuizIntroScreen extends StatelessWidget {
@@ -56,22 +57,22 @@ class CreateQuizIntroScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final bool canCreate =
-                                await appState.ensureCanCreateCustomQuizSet();
-                            if (!canCreate) {
-                              return;
-                            }
-                            Navigator.of(context).pushNamed(
-                              CreateQuizCaptureScreen.routeName,
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 48),
+                          child: PuniButton(
+                            text: l10n.createIntroStartButton,
+                            color: const Color(0xFF61C178),
+                            onPressed: () async {
+                              final bool canCreate =
+                                  await appState.ensureCanCreateCustomQuizSet();
+                              if (!canCreate) {
+                                return;
+                              }
+                              Navigator.of(context).pushNamed(
+                                CreateQuizCaptureScreen.routeName,
+                              );
+                            },
                           ),
-                          child: Text(l10n.createIntroStartButton),
                         ),
                       ],
                     ),
