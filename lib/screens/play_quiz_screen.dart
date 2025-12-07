@@ -10,6 +10,7 @@ import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/puni_button.dart';
+import '../widgets/audio_toggle_button.dart';
 import '../widgets/factory_dialog.dart';
 import '../services/audio_service.dart';
 import '../widgets/sparkle_background.dart';

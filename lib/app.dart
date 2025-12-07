@@ -13,6 +13,7 @@ import 'screens/create_quiz_confirm_screen.dart';
 import 'screens/play_quiz_screen.dart';
 import 'widgets/puff_route.dart';
 import 'services/audio_service.dart';
+import 'widgets/audio_toggle_button.dart';
 
 class MyApp extends StatefulWidget {
   final QuizAppState appState;
@@ -79,6 +80,14 @@ class _MyAppState extends State<MyApp> {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
+          builder: (context, child) {
+            return Stack(
+              children: [
+                if (child != null) child,
+                const AudioToggleButton(),
+              ],
+            );
+          },
           onGenerateRoute: (settings) {
             switch (settings.name) {
               case ChallengeScreen.routeName:

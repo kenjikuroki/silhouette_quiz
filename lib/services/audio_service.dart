@@ -15,6 +15,7 @@ class AudioService {
   final AudioPlayer _fallBoxPlayer = AudioPlayer();
   final AudioPlayer _characterChangePlayer = AudioPlayer();
   String _currentBgmAsset = 'bgm/BGM.mp3';
+  bool _muted = false;
 
   bool _initialized = false;
 
@@ -136,6 +137,11 @@ class AudioService {
     await _bgmPlayer.stop();
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource(asset));
+    if (_muted) {
+      await _bgmPlayer.setVolume(0);
+    } else {
+      await _bgmPlayer.setVolume(0.5);
+    }
   }
 
   Future<void> dispose() async {
@@ -149,5 +155,21 @@ class AudioService {
     await _fallBoxPlayer.dispose();
     await _characterChangePlayer.dispose();
     _initialized = false;
+  }
+
+  bool get isMuted => _muted;
+
+  Future<void> setMuted(bool muted) async {
+    _muted = muted;
+    final double volume = muted ? 0 : 0.5;
+    await _bgmPlayer.setVolume(volume);
+    await _buttonPlayer.setVolume(muted ? 0 : 0.2);
+    await _effectPlayer.setVolume(muted ? 0 : 0.5);
+    await _cheerPlayer.setVolume(muted ? 0 : 0.35);
+    await _leverPlayer.setVolume(muted ? 0 : 0.4);
+    await _challengePlayer.setVolume(muted ? 0 : 0.4);
+    await _whistlePlayer.setVolume(muted ? 0 : 0.4);
+    await _fallBoxPlayer.setVolume(muted ? 0 : 0.5);
+    await _characterChangePlayer.setVolume(muted ? 0 : 0.6);
   }
 }
