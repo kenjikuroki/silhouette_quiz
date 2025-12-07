@@ -44,7 +44,9 @@ class CreateQuizIntroScreen extends StatelessWidget {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                            horizontal: 32,
+                            vertical: 18,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.8),
                             borderRadius: BorderRadius.circular(16),
@@ -60,22 +62,24 @@ class CreateQuizIntroScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         const SizedBox(height: 24),
-                        SizedBox(
-                          width: 200, // Fixed width, narrower than before
-                          child: PuniButton(
-                            text: l10n.createIntroStartButton,
-                            color: PuniButtonColors.green,
-                            textColor: Colors.white,
-                            onPressed: () async {
-                              final bool canCreate =
-                                  await appState.ensureCanCreateCustomQuizSet();
-                              if (!canCreate) {
-                                return;
-                              }
-                              Navigator.of(context).pushNamed(
-                                CreateQuizCaptureScreen.routeName,
-                              );
-                            },
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 140),
+                            child: PuniButton(
+                              text: l10n.createIntroStartButton,
+                              color: PuniButtonColors.green,
+                              textColor: Colors.white,
+                              onPressed: () async {
+                                final bool canCreate =
+                                    await appState.ensureCanCreateCustomQuizSet();
+                                if (!canCreate) {
+                                  return;
+                                }
+                                Navigator.of(context).pushNamed(
+                                  CreateQuizCaptureScreen.routeName,
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ],

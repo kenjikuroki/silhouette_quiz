@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../services/audio_service.dart';
+
 class PuniButtonColors {
   static const Color pink = Color(0xFFFF7DA0);
   static const Color green = Color(0xFF61C178);
@@ -15,6 +17,7 @@ class PuniButton extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final double borderRadius;
   final double? height;
+  final bool playSound;
 
   const PuniButton({
     super.key,
@@ -26,6 +29,7 @@ class PuniButton extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
     this.borderRadius = 30,
     this.height,
+    this.playSound = true,
   }) : assert(text != null || child != null,
             'PuniButton requires either text or child.');
 
@@ -60,7 +64,14 @@ class PuniButton extends StatelessWidget {
           color: color,
           borderRadius: BorderRadius.circular(borderRadius),
           child: InkWell(
-            onTap: disabled ? null : onPressed,
+            onTap: disabled
+                ? null
+                : () {
+                    if (playSound) {
+                      AudioService.instance.playButtonSound();
+                    }
+                    onPressed?.call();
+                  },
             borderRadius: BorderRadius.circular(borderRadius),
             splashColor: Colors.white.withOpacity(0.2),
             highlightColor: Colors.white.withOpacity(0.1),

@@ -12,6 +12,7 @@ import 'screens/create_quiz_capture_screen.dart';
 import 'screens/create_quiz_confirm_screen.dart';
 import 'screens/play_quiz_screen.dart';
 import 'widgets/puff_route.dart';
+import 'services/audio_service.dart';
 
 class MyApp extends StatefulWidget {
   final QuizAppState appState;
@@ -27,6 +28,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   QuizAppState get appState => widget.appState;
+
+  @override
+  void initState() {
+    super.initState();
+    AudioService.instance.initialize();
+  }
 
   @override
   Widget build(BuildContext context) {

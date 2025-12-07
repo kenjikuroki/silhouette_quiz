@@ -282,12 +282,6 @@ class QuizAppState extends ChangeNotifier {
             originalImagePath: 'assets/images/quiz/home/umbrella.png',
             answerText: 'かさ|あんぶれら|umbrella',
           ),
-          QuizQuestion(
-            id: 'home_watch',
-            silhouetteImagePath: 'assets/images/quiz/home/watch_b.png',
-            originalImagePath: 'assets/images/quiz/home/watch.png',
-            answerText: 'とけい|うぉっち|watch',
-          ),
         ],
       ),
 

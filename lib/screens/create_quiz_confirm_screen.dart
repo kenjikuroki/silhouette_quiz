@@ -7,6 +7,7 @@ import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/puni_button.dart';
 import '../widgets/factory_dialog.dart';
+import '../services/audio_service.dart';
 import 'challenge_screen.dart';
 
 class CreateQuizConfirmArguments {
@@ -39,6 +40,9 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
   final TextEditingController _titleController = TextEditingController();
   bool _defaultTitleApplied = false;
   bool _isSaving = false;
+  bool _buttonsEnabled = false;
+  bool _buttonsLocked = false;
+  bool _fallSoundPlayed = false;
 
   late AnimationController _boxDropController;
   late Animation<Offset> _boxDropAnimation;
@@ -78,6 +82,22 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
       ),
     ]).animate(_boxDropController);
 
+    _boxDropController.addStatusListener((AnimationStatus status) {
+      if (status == AnimationStatus.forward && _boxDropController.value == 0) {
+        AudioService.instance.playWhistleSound();
+      }
+      if (status == AnimationStatus.dismissed) {
+        _fallSoundPlayed = false;
+      }
+    });
+
+    _boxDropController.addListener(() {
+      if (!_fallSoundPlayed && _boxDropController.value >= 0.75) {
+        _fallSoundPlayed = true;
+        AudioService.instance.playFallBoxSound();
+      }
+    });
+
     // Box Slide (Exit): 2s
     _boxSlideController = AnimationController(
        duration: const Duration(seconds: 2),
@@ -104,7 +124,14 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
     // Start drop animation with 0.5s delay
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
-        _boxDropController.forward();
+        _fallSoundPlayed = false;
+        _boxDropController.forward().whenComplete(() {
+          if (mounted) {
+            setState(() {
+              _buttonsEnabled = true;
+            });
+          }
+        });
       }
     });
   }
@@ -238,18 +265,24 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       SizedBox(
-                                        width: 160, // Widened from 120
+                                        width: 160,
                                         child: PuniButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
+                                          onPressed: _buttonsEnabled && !_buttonsLocked
+                                              ? () {
+                                                  setState(() {
+                                                    _buttonsLocked = true;
+                                                  });
+                                                  Navigator.of(context)
+                                                      .pop();
+                                                }
+                                              : null,
                                           color: PuniButtonColors.blueGrey,
                                           textColor: Colors.white,
                                           child: Text(
                                             l10n.createConfirmBackButton,
                                             style: const TextStyle(
                                               fontSize: 14,
-                                              color: Colors.white, // Explicit white
+                                              color: Colors.white,
                                             ),
                                           ),
                                           height: 48,
@@ -257,11 +290,11 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                       ),
                                       const SizedBox(width: 24),
                                       SizedBox(
-                                        width: 160, // Widened from 120
+                                        width: 160,
                                         child: PuniButton(
                                           color: PuniButtonColors.pink,
                                           textColor: Colors.white,
-                                          onPressed: _isSaving
+                                          onPressed: _isSaving || !_buttonsEnabled || _buttonsLocked
                                               ? null
                                               : () async {
                                                   final String title =
@@ -283,6 +316,7 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
 
                                                   setState(() {
                                                     _isSaving = true;
+                                                    _buttonsLocked = true;
                                                   });
 
                                                   try {
@@ -311,27 +345,38 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                                     _conveyorShakeController
                                                         .reset();
 
-                                                    await showDialog<void>(
-                                                      context: context,
-                                                      barrierDismissible:
-                                                          false,
-                                                      builder:
-                                                          (dialogContext) {
-                                                        return FactoryDialog(
-                                                          title: l10n
-                                                              .createConfirmCompleteTitle,
-                                                          message: l10n
-                                                              .createConfirmCompleteMessage,
-                                                          icon: const Icon(
-                                                            Icons
-                                                                .check_circle,
-                                                            color: Color(
-                                                                0xFF61C178),
-                                                            size: 56,
-                                                          ),
-                                                          actions: [
-                                                            PuniButton(
-                                                              text: l10n
+                                                  AudioService.instance
+                                                      .playCheerSound();
+
+                                                  await showDialog<void>(
+                                                    context: context,
+                                                    barrierDismissible:
+                                                        false,
+                                                    builder:
+                                                        (dialogContext) {
+                                                      return FactoryDialog(
+                                                        title: l10n
+                                                            .createConfirmCompleteTitle,
+                                                        message: l10n
+                                                            .createConfirmCompleteMessage,
+                                                        headerImage:
+                                                            Image.asset(
+                                                          'assets/images/character/character.png',
+                                                          height: 96,
+                                                          fit: BoxFit.contain,
+                                                        ),
+                                                        showCongratulationHeader:
+                                                            true,
+                                                        backgroundAsset:
+                                                            'assets/images/character/completion.png',
+                                                        celebrationTitle:
+                                                            'かんせい！',
+                                                        hideCelebrationMessage:
+                                                            true,
+                                                        useSparkle: false,
+                                                        actions: [
+                                                          PuniButton(
+                                                            text: l10n
                                                                   .commonOk,
                                                               color:
                                                                   PuniButtonColors
@@ -375,27 +420,27 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                                       );
                                                     }
                                                   }
-                                                },
-                                          height: 48,
-                                          child: _isSaving
-                                              ? const SizedBox(
-                                                  width: 24,
-                                                  height: 24,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    color: Colors.white,
-                                                    strokeWidth: 2,
-                                                  ),
-                                                )
-                                              : Text(
-                                                  l10n.createConfirmSaveButton,
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.white, // Explicit white
-                                                  ),
-                                                ),
-                                        ),
-                                      ),
+                                                    },
+                                              height: 48,
+                                              child: _isSaving
+                                                  ? const SizedBox(
+                                                      width: 24,
+                                                      height: 24,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        color: Colors.white,
+                                                        strokeWidth: 2,
+                                                      ),
+                                                    )
+                                                  : Text(
+                                                      l10n.createConfirmSaveButton,
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                            ),
+                                          ),
                                     ],
                                   ),
                                   const SizedBox(height: 0), // Moved lower (was 10)

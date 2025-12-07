@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/puff_route.dart';
+import '../services/audio_service.dart';
 import 'challenge_screen.dart';
 import 'create_quiz_intro_screen.dart';
 
@@ -93,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen>
     _stretchController.stop();
     _stretchController.reset();
 
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    Future.delayed(const Duration(milliseconds: 800), () {
       if (!mounted) return;
       _shakeController.stop();
       _shakeController.reset();
@@ -109,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen>
         _hasChangedCharacter = true;
         _characterAlignment = _dropAlignment;
         _shouldAnimateCharacter = false;
+        AudioService.instance.playCharacterPopSound();
       });
 
       // ゆらゆら開始
@@ -139,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen>
       _characterAlignment = _dropAlignment;
       _shouldAnimateCharacter = true;
     });
+    AudioService.instance.playWhistleSound();
   }
 
   void _onDropFinished() {
@@ -149,10 +152,11 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _onChallengePressed() async {
-    if (_isChallengePressed) return;
+    if (_isChallengePressed || _isCreatePressed) return;
     setState(() {
       _isChallengePressed = true;
     });
+    AudioService.instance.playChallengeSound();
     await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return;
     await Navigator.of(context)
@@ -165,10 +169,11 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _onCreatePressed() async {
-    if (_isCreatePressed) return;
+    if (_isCreatePressed || _isChallengePressed) return;
     setState(() {
       _isCreatePressed = true;
     });
+    AudioService.instance.playLeverSound();
     await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return;
     await Navigator.of(context)
@@ -228,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen>
                 left: horizontalOffset + challengeLeft * scale,
                 bottom: challengeBottomPos,
                 child: _buildActionObject(
-                  width: challengeWidth * scale,
+                  width: challengeWidth * scale * 1.1,
                   imagePath: _isChallengePressed
                       ? 'assets/images/button/challenge_bo_P.png'
                       : 'assets/images/button/challenge_bo.png',
@@ -241,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen>
                 left: horizontalOffset + createLeft * scale,
                 bottom: createBottomPos,
                 child: _buildActionObject(
-                  width: createWidth * scale,
+                  width: createWidth * scale * 1.1,
                   imagePath: _isCreatePressed
                       ? 'assets/images/button/myself_left_bo.png'
                       : 'assets/images/button/myself_right_bo.png',

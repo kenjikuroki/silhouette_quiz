@@ -11,6 +11,7 @@ import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/puni_button.dart';
 import '../widgets/factory_dialog.dart';
+import '../services/audio_service.dart';
 import '../widgets/sparkle_background.dart';
 
 class PlayQuizArguments {
@@ -60,6 +61,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
   @override
   void initState() {
     super.initState();
+    AudioService.instance.playQuizBgm();
     _pageController = PageController();
 
     // Initial slide-in animation (Right to Center)
@@ -112,6 +114,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
 
   @override
   void dispose() {
+    AudioService.instance.playMainBgm();
     _pageController.dispose();
     _initialSlideController.dispose();
     _conveyorController.dispose();
@@ -317,12 +320,17 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                             text: l10n.playQuizIncorrect,
                                             color: PuniButtonColors.blueGrey,
                                             height: 44,
+                                            playSound: false,
                                             onPressed: hasCurrentAnswered
                                                 ? null
-                                                : () => _onSelfJudge(
+                                                : () {
+                                                    AudioService.instance
+                                                        .playWrongSound();
+                                                    _onSelfJudge(
                                                       context,
                                                       isCorrect: false,
-                                                    ),
+                                                    );
+                                                  },
                                           ),
                                         ),
                                       ),
@@ -335,12 +343,17 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                             text: l10n.playQuizCorrect,
                                             color: PuniButtonColors.pink,
                                             height: 44,
+                                            playSound: false,
                                             onPressed: hasCurrentAnswered
                                                 ? null
-                                                : () => _onSelfJudge(
+                                                : () {
+                                                    AudioService.instance
+                                                        .playClearSound();
+                                                    _onSelfJudge(
                                                       context,
                                                       isCorrect: true,
-                                                    ),
+                                                    );
+                                                  },
                                           ),
                                         ),
                                       ),
@@ -569,6 +582,8 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     final int total = _questions.length;
     final String message = l10n.playQuizResultMessage(_correctCount, total);
 
+    AudioService.instance.playCheerSound();
+
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -576,10 +591,38 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
         return FactoryDialog(
           title: l10n.playQuizResultTitle,
           message: message,
-          icon: const Icon(
-            Icons.emoji_events,
-            color: Color(0xFFFFC746),
-            size: 56,
+          showCongratulationHeader: true,
+          backgroundAsset: 'assets/images/character/result.png',
+          borderColor: const Color(0xFFE49A00),
+          celebrationTitle: 'がんばったね！',
+          icon: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(total, (int index) {
+              final bool filled = index < _correctCount;
+              final Color fillColor = filled
+                  ? const Color(0xFFFFF176)
+                  : Colors.white.withOpacity(0.8);
+              final IconData fillIcon = Icons.star;
+              final IconData outlineIcon = Icons.star_border;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    const Icon(
+                      Icons.star,
+                      color: Colors.black,
+                      size: 44,
+                    ),
+                    Icon(
+                      filled ? fillIcon : outlineIcon,
+                      color: fillColor,
+                      size: 36,
+                    ),
+                  ],
+                ),
+              );
+            }),
           ),
           actions: [
             PuniButton(

@@ -71,7 +71,7 @@ class AppLocalizations {
       'play_quiz_correct': 'あってた！',
       'play_quiz_incorrect': 'ちがった',
       'play_quiz_result_title': 'けっか',
-      'play_quiz_result_message': '{total}もん 中 {correct}もん せいかい！',
+      'play_quiz_result_message': '{total}もん ちゅう {correct}もん せいかい！',
 
       // Delete
       'delete_quiz_confirm_title': 'このクイズを けす？',
