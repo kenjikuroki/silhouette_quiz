@@ -11,6 +11,7 @@ import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/puni_button.dart';
 import '../widgets/factory_dialog.dart';
+import '../widgets/sparkle_background.dart';
 
 class PlayQuizArguments {
   final String quizSetId;
