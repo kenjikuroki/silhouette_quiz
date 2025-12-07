@@ -30,7 +30,7 @@ class CustomQuizListScreen extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/backgrounds/backgrround_start_list.png',
+              'assets/images/backgrounds/background_wall.png',
               fit: BoxFit.cover,
             ),
           ),

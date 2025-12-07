@@ -54,7 +54,7 @@ class AppLocalizations {
       'capture_delete_message': 'あとから もどせないよ。',
       'capture_delete_ok': 'けす',
       'create_confirm_title': 'これで いい？',
-      'create_confirm_message': 'とった しゃしん から クイズを つくります。',
+      'create_confirm_message': 'できあがったクイズの なまえを きめよう',
       'create_confirm_title_label': 'クイズの なまえ',
       'create_confirm_default_title': 'クイズ{number}',
       'create_confirm_save_button': 'これでOK！',
@@ -64,7 +64,7 @@ class AppLocalizations {
 
       // Play quiz
       'play_quiz_title': 'クイズ',
-      'play_quiz_show_answer': 'こたえを見る',
+      'play_quiz_show_answer': 'こたえをみる',
       'play_quiz_next': 'つぎへ',
       'play_quiz_finish': 'おわる',
       'play_quiz_answer_label': 'こたえ',

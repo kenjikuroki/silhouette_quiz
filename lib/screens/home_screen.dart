@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
 import '../state/quiz_app_state.dart';
+import '../widgets/puff_route.dart';
 import 'challenge_screen.dart';
 import 'create_quiz_intro_screen.dart';
 
@@ -31,6 +32,10 @@ class _HomeScreenState extends State<HomeScreen>
   late final AnimationController _shakeController;
   late final AnimationController _swayController;
   late final Animation<double> _swayAnimation;
+  // 追加: 縦に伸び縮みするアニメーション用
+  late final AnimationController _stretchController;
+  late final Animation<double> _stretchAnimation;
+
   bool _isChangingCharacter = false;
   bool _shouldAnimateCharacter = false;
   bool _isChallengePressed = false;
@@ -56,13 +61,25 @@ class _HomeScreenState extends State<HomeScreen>
     _swayAnimation = Tween<double>(begin: -0.02, end: 0.02).animate(
       CurvedAnimation(parent: _swayController, curve: Curves.easeInOut),
     );
-    _swayController.repeat(reverse: true);
+    // 初期状態では揺れない (落ちてから伸び縮み、タップで揺れる)
+    // _swayController.repeat(reverse: true);
+
+    // 縦に伸び縮みするアニメーションの初期化
+    _stretchController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    // 1.0 (通常) -> 1.05 (少し伸びる)
+    _stretchAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(parent: _stretchController, curve: Curves.easeInOut),
+    );
   }
 
   @override
   void dispose() {
     _shakeController.dispose();
     _swayController.dispose();
+    _stretchController.dispose();
     super.dispose();
   }
 
@@ -71,6 +88,10 @@ class _HomeScreenState extends State<HomeScreen>
 
     _isChangingCharacter = true;
     _shakeController.repeat(period: const Duration(milliseconds: 140));
+
+    // 伸び縮み停止
+    _stretchController.stop();
+    _stretchController.reset();
 
     Future.delayed(const Duration(milliseconds: 1000), () {
       if (!mounted) return;
@@ -90,6 +111,9 @@ class _HomeScreenState extends State<HomeScreen>
         _shouldAnimateCharacter = false;
       });
 
+      // ゆらゆら開始
+      _swayController.repeat(reverse: true);
+
       _isChangingCharacter = false;
     });
   }
@@ -103,6 +127,11 @@ class _HomeScreenState extends State<HomeScreen>
       _isChallengePressed = false;
       _isCreatePressed = false;
     });
+    // アニメーションリセット
+    _swayController.stop();
+    _swayController.reset();
+    _stretchController.stop();
+    _stretchController.reset();
   }
 
   void _dropCharacter() {
@@ -110,6 +139,13 @@ class _HomeScreenState extends State<HomeScreen>
       _characterAlignment = _dropAlignment;
       _shouldAnimateCharacter = true;
     });
+  }
+
+  void _onDropFinished() {
+    // 落ちきった後にキャラクターが変更されていなければ伸び縮み開始
+    if (!_hasChangedCharacter) {
+      _stretchController.repeat(reverse: true);
+    }
   }
 
   Future<void> _onChallengePressed() async {
@@ -214,8 +250,6 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
               ),
 
-
-
               // ② キャラクター（最前面、少し小さく）
               // アニメーションで落ちてくる
               AnimatedAlign(
@@ -224,25 +258,33 @@ class _HomeScreenState extends State<HomeScreen>
                     : Duration.zero,
                 curve: Curves.easeOutCubic,
                 alignment: _characterAlignment,
+                onEnd: _onDropFinished,
                 child: GestureDetector(
                   onTap: _changeCharacter,
-                  child: RotationTransition(
-                    turns: _swayAnimation,
+                  child: ScaleTransition(
+                    scale: _stretchAnimation,
                     alignment: Alignment.bottomCenter,
-                    child: AnimatedBuilder(
-                      animation: _shakeController,
-                      builder: (context, child) {
-                        final double dx =
-                            sin(_shakeController.value * 2 * pi) * 8;
-                        return Transform.translate(
-                          offset: Offset(dx, 0),
-                          child: child,
-                        );
-                      },
-                      child: Image.asset(
-                        _currentCharacterImage,
-                        width: w * 0.5, // 0.635 -> 0.5 に縮小
-                        fit: BoxFit.contain,
+                    child: RotationTransition(
+                      // まだキャラクターが変わっていない時（最初のキャラ）は揺れない
+                      turns: _hasChangedCharacter
+                          ? _swayAnimation
+                          : const AlwaysStoppedAnimation(0),
+                      alignment: Alignment.bottomCenter,
+                      child: AnimatedBuilder(
+                        animation: _shakeController,
+                        builder: (context, child) {
+                          final double dx =
+                              sin(_shakeController.value * 2 * pi) * 8;
+                          return Transform.translate(
+                            offset: Offset(dx, 0),
+                            child: child,
+                          );
+                        },
+                        child: Image.asset(
+                          _currentCharacterImage,
+                          width: w * 0.5, // 0.635 -> 0.5 に縮小
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),

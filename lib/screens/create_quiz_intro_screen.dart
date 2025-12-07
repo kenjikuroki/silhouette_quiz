@@ -4,6 +4,7 @@ import '../localization/app_localizations.dart';
 import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
+import '../widgets/puff_route.dart';
 import '../widgets/puni_button.dart';
 import 'create_quiz_capture_screen.dart';
 
@@ -39,6 +40,7 @@ class CreateQuizIntroScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -57,11 +59,13 @@ class CreateQuizIntroScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 48),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: 200, // Fixed width, narrower than before
                           child: PuniButton(
                             text: l10n.createIntroStartButton,
                             color: PuniButtonColors.green,
+                            textColor: Colors.white,
                             onPressed: () async {
                               final bool canCreate =
                                   await appState.ensureCanCreateCustomQuizSet();

@@ -24,7 +24,7 @@ class MLKitSilhouetteProcessor {
 
   /// 写真からシルエット画像を生成
   /// 入力：写真ファイルのパス
-  /// 出力：生成されたシルエット画像のパス（PNG形式、背景白）
+  /// 出力：生成されたシルエット画像のパス（PNG形式、背景透明）
   Future<String> createSilhouette(String inputPath) async {
     if (!_isInitialized) {
       await initialize();

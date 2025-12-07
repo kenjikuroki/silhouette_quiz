@@ -11,6 +11,7 @@ import 'screens/create_quiz_intro_screen.dart';
 import 'screens/create_quiz_capture_screen.dart';
 import 'screens/create_quiz_confirm_screen.dart';
 import 'screens/play_quiz_screen.dart';
+import 'widgets/puff_route.dart';
 
 class MyApp extends StatefulWidget {
   final QuizAppState appState;
@@ -74,43 +75,50 @@ class _MyAppState extends State<MyApp> {
           onGenerateRoute: (settings) {
             switch (settings.name) {
               case ChallengeScreen.routeName:
-                return MaterialPageRoute(
+                return PuffRoute(
                   builder: (_) => ChallengeScreen(appState: appState),
+                  settings: settings,
                 );
               case CustomQuizListScreen.routeName:
-                return MaterialPageRoute(
+                return PuffRoute(
                   builder: (_) => CustomQuizListScreen(appState: appState),
+                  settings: settings,
                 );
               case CreateQuizIntroScreen.routeName:
-                return MaterialPageRoute(
+                return PuffRoute(
                   builder: (_) => CreateQuizIntroScreen(appState: appState),
+                  settings: settings,
                 );
               case CreateQuizCaptureScreen.routeName:
-                return MaterialPageRoute(
+                return PuffRoute(
                   builder: (_) => CreateQuizCaptureScreen(appState: appState),
+                  settings: settings,
                 );
               case CreateQuizConfirmScreen.routeName:
                 final CreateQuizConfirmArguments args =
                     settings.arguments as CreateQuizConfirmArguments;
-                return MaterialPageRoute(
+                return PuffRoute(
                   builder: (_) => CreateQuizConfirmScreen(
                     appState: appState,
                     tempQuestions: args.tempQuestions,
                   ),
+                  settings: settings,
                 );
               case PlayQuizScreen.routeName:
                 final PlayQuizArguments args =
                     settings.arguments as PlayQuizArguments;
-                return MaterialPageRoute(
+                return PuffRoute(
                   builder: (_) => PlayQuizScreen(
                     appState: appState,
                     quizSetId: args.quizSetId,
                   ),
+                  settings: settings,
                 );
               case HomeScreen.routeName:
               default:
-                return MaterialPageRoute(
+                return PuffRoute(
                   builder: (_) => HomeScreen(appState: appState),
+                  settings: settings,
                 );
             }
           },

@@ -105,9 +105,12 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                               ),
                               const SizedBox(width: 16),
                               // Buttons on the Right
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
+                              SizedBox(
+                                width: 180,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
                                   if (_tempQuestions.length >= maxImages)
                                     Padding(
                                       padding: const EdgeInsets.only(bottom: 16),
@@ -129,33 +132,50 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                                         ),
                                       ),
                                     ),
-                                  PuniButton(
-                                    text: 'しゃしんをとる',
-                                    color: PuniButtonColors.green,
-                                    onPressed: _tempQuestions.length >= maxImages
-                                        ? null
-                                        : _captureImageFromCamera,
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: SizedBox(
+                                      width: 180,
+                                      child: PuniButton(
+                                        text: 'しゃしんをとる',
+                                        color: PuniButtonColors.green,
+                                        onPressed:
+                                            _tempQuestions.length >= maxImages
+                                                ? null
+                                                : _captureImageFromCamera,
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(height: 16),
-                                  PuniButton(
-                                    text: l10n.createCaptureFinish,
-                                    color: PuniButtonColors.pink,
-                                    onPressed: _tempQuestions.isEmpty
-                                        ? null
-                                        : () {
-                                            Navigator.of(context).pushNamed(
-                                              CreateQuizConfirmScreen.routeName,
-                                              arguments: CreateQuizConfirmArguments(
-                                                tempQuestions:
-                                                    List<QuizQuestion>.from(
-                                                  _tempQuestions,
-                                                ),
-                                              ),
-                                            );
-                                          },
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: SizedBox(
+                                      width: 180,
+                                      child: PuniButton(
+                                        text: l10n.createCaptureFinish,
+                                        color: PuniButtonColors.pink,
+                                        onPressed: _tempQuestions.isEmpty
+                                            ? null
+                                            : () {
+                                                Navigator.of(context)
+                                                    .pushNamed(
+                                                  CreateQuizConfirmScreen
+                                                      .routeName,
+                                                  arguments:
+                                                      CreateQuizConfirmArguments(
+                                                    tempQuestions:
+                                                        List<QuizQuestion>.from(
+                                                      _tempQuestions,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(height: 80), // Added spacing to lift buttons
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),

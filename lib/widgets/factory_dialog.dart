@@ -23,7 +23,7 @@ class FactoryDialog extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.95),
           borderRadius: BorderRadius.circular(32),
-          border: Border.all(color: const Color(0xFFFFB4CF), width: 4),
+          border: Border.all(color: const Color(0xFFD080FF), width: 8),
           boxShadow: const [
             BoxShadow(
               color: Color(0x33000000),

@@ -47,6 +47,11 @@ flutter:
   assets:
     - assets/images/backgrounds/
     - assets/images/quiz/home/
+    - assets/images/quiz/animal/
+    - assets/images/quiz/food/
+    - assets/images/quiz/kitchen/
+    - assets/images/quiz/school_supplies/
+    - assets/images/quiz/vehicle/
     - assets/images/character/
 
     - assets/images/button/

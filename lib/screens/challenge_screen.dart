@@ -32,7 +32,7 @@ class ChallengeScreen extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/backgrounds/backgrround_start_list.png',
+              'assets/images/backgrounds/background_wall.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -47,7 +47,6 @@ class ChallengeScreen extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 左側: みんなのクイズ
                         Expanded(
                           child: Column(
                             children: [
@@ -71,18 +70,18 @@ class ChallengeScreen extends StatelessWidget {
                                 child: ListView(
                                   children: defaultSets
                                       .map(
-                                      (set) => FactoryPlateCard(
-                                        onTap: () {
-                                          Navigator.of(context).pushNamed(
-                                            PlayQuizScreen.routeName,
-                                            arguments: PlayQuizArguments(
-                                                quizSetId: set.id),
-                                          );
-                                        },
-                                        child: ListTile(
-                                          title: Text(set.title),
+                                        (set) => FactoryPlateCard(
+                                          onTap: () {
+                                            Navigator.of(context).pushNamed(
+                                              PlayQuizScreen.routeName,
+                                              arguments: PlayQuizArguments(
+                                                  quizSetId: set.id),
+                                            );
+                                          },
+                                          child: ListTile(
+                                            title: Text(set.title),
+                                          ),
                                         ),
-                                      ),
                                       )
                                       .toList(),
                                 ),

@@ -43,6 +43,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
   final Set<int> _answeredIndices = {}; // Indices where user answered (buttons disabled)
   int _correctCount = 0;
   bool _markedViewed = false;
+  bool _isImageSettled = false;
 
   late PageController _pageController;
   late AnimationController _initialSlideController;
@@ -72,6 +73,13 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
       parent: _initialSlideController,
       curve: Curves.easeInOut,
     ));
+    _initialSlideController.addStatusListener((AnimationStatus status) {
+      if (status == AnimationStatus.completed && mounted) {
+        setState(() {
+          _isImageSettled = true;
+        });
+      }
+    });
 
     // Conveyor vibration controller
     _conveyorController = AnimationController(
@@ -87,6 +95,9 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     final QuizSet? quizSet = appState.findQuizSetById(widget.quizSetId);
     if (quizSet != null && quizSet.questions.isNotEmpty) {
       _questions = List<QuizQuestion>.from(quizSet.questions)..shuffle();
+      if (_questions.length > 5) {
+        _questions = _questions.sublist(0, 5);
+      }
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -149,6 +160,10 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     }
 
     final bool isLast = _currentIndex == _questions.length - 1;
+    final bool currentAnswerRevealed =
+        _revealedIndices.contains(_currentIndex);
+    final bool hasCurrentAnswered =
+        _answeredIndices.contains(_currentIndex);
 
     return Scaffold(
       body: Stack(
@@ -252,66 +267,98 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                       ), // Expanded
                         const SizedBox(height: 16),
                         SizedBox(
-                          height: 80,
-                          child: !_revealedIndices.contains(_currentIndex)
-                              ? Center(
-                                  child: ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 240),
-                                    child: PuniButton(
-                                      text: l10n.playQuizShowAnswer,
-                                      color: PuniButtonColors.green,
-                                      onPressed: () {
-                                        setState(() {
-                                          _revealedIndices.add(_currentIndex);
-                                          _answeredIndices.remove(_currentIndex);
-                                        });
-                                      },
-                                    ),
+                          height: 60,
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 400),
+                            transitionBuilder:
+                                (Widget child, Animation<double> animation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                            child: !currentAnswerRevealed
+                                ? (_isImageSettled
+                                    ? Center(
+                                        key: ValueKey<int>(
+                                            _currentIndex),
+                                        child: ConstrainedBox(
+                                          constraints: const BoxConstraints(
+                                              maxWidth: 220),
+                                          child: PuniButton(
+                                            text: l10n.playQuizShowAnswer,
+                                            color: PuniButtonColors.green,
+                                            height: 44,
+                                            onPressed: () {
+                                              setState(() {
+                                                _revealedIndices
+                                                    .add(_currentIndex);
+                                                _answeredIndices.remove(
+                                                    _currentIndex);
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      )
+                                    : const SizedBox.shrink())
+                                : Row(
+                                    key: ValueKey<String>(
+                                        'judge_buttons_$_currentIndex'),
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 16.0),
+                                          child: PuniButton(
+                                            text: l10n.playQuizIncorrect,
+                                            color: PuniButtonColors.blueGrey,
+                                            height: 44,
+                                            onPressed: hasCurrentAnswered
+                                                ? null
+                                                : () => _onSelfJudge(
+                                                      context,
+                                                      isCorrect: false,
+                                                    ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 16.0),
+                                          child: PuniButton(
+                                            text: l10n.playQuizCorrect,
+                                            color: PuniButtonColors.pink,
+                                            height: 44,
+                                            onPressed: hasCurrentAnswered
+                                                ? null
+                                                : () => _onSelfJudge(
+                                                      context,
+                                                      isCorrect: true,
+                                                    ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                        child: PuniButton(
-                                          text: l10n.playQuizCorrect,
-                                          color: PuniButtonColors.pink,
-                                          onPressed: () => _onSelfJudge(
-                                            context,
-                                            isCorrect: true,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                        child: PuniButton(
-                                          text: l10n.playQuizIncorrect,
-                                          color: PuniButtonColors.blueGrey,
-                                          onPressed: () => _onSelfJudge(
-                                            context,
-                                            isCorrect: false,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                          ),
                         ),
+                        const SizedBox(height: 16), // Adjusted to lower buttons
                       ],
                     ),
                   ),
                 ),
                 // Independent Answer Text Overlay
                 Positioned(
-                  top: 100,
-                  left: 80,
+                  top: 80, // Moved up from 100
+                  left: 24,
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
-                    child: _revealedIndices.contains(_currentIndex)
+                    child: currentAnswerRevealed
                         ? Container(
                             key: ValueKey('answer_$_currentIndex'),
                             padding: const EdgeInsets.symmetric(
@@ -320,14 +367,8 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                               color: Colors.white.withOpacity(0.8),
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: Text(
-                              _questions[_currentIndex].answerText ?? '',
-                              style: const TextStyle(
-                                fontSize: 48,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
+                            child: _buildFormattedAnswer(
+                                _questions[_currentIndex].answerText),
                           )
                         : const SizedBox.shrink(),
                   ),
@@ -338,6 +379,60 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFormattedAnswer(String? text) {
+    if (text == null || text.isEmpty) return const SizedBox.shrink();
+
+    final List<String> parts = text.split('|');
+    if (parts.length == 1) {
+      return Text(
+        text,
+        style: const TextStyle(
+          fontSize: 48,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 1. Main Text (Large)
+        Text(
+          parts[0],
+          style: const TextStyle(
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        // 2. Sub Text (Small)
+        if (parts.length > 1)
+          Text(
+            parts[1],
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black54,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        // 3. English Text (Large)
+        if (parts.length > 2)
+          Text(
+            parts[2],
+            style: const TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.center,
+          ),
+      ],
     );
   }
 
@@ -365,7 +460,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
           color: Colors.transparent, 
           child: Image.asset(
             path,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {
                return Container(
                 decoration: BoxDecoration(
@@ -403,7 +498,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
           color: Colors.grey[300], // グレー背景で白いシルエットを見やすく
           child: Image.file(
             file,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
         ),
       );
@@ -430,10 +525,10 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
 
 
 
-  void _onSelfJudge(
+  Future<void> _onSelfJudge(
     BuildContext context, {
     required bool isCorrect,
-  }) {
+  }) async {
     // 正解数カウント
     if (isCorrect) {
       _correctCount++;
@@ -446,13 +541,25 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     if (isLast) {
       _finishQuiz(context);
     } else {
-      // 2秒かけて次の問題へスライド
-      _pageController.nextPage(
+      setState(() {
+        _isImageSettled = false;
+      });
+
+      final Future<void> pageTransition = _pageController.nextPage(
         duration: const Duration(seconds: 2),
         curve: Curves.easeInOut,
       );
-      // コンベアも振動させる
+      // 2秒かけて次の問題へスライド
       _conveyorController.forward(from: 0);
+
+      await pageTransition;
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _isImageSettled = true;
+      });
+      // コンベアも振動させる
     }
   }
 
