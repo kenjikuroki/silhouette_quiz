@@ -22,6 +22,7 @@ class PremiumPromotionDialog extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return FactoryDialog(
       title: l10n.premiumPromotionTitle,
+      titleFontSize: 18,
       message: '', // Custom content used below
       forceAspectRatio: false, // Auto height
       borderColor: const Color(0xFFFFD700), // Gold/Yellow for Premium
@@ -42,14 +43,21 @@ class PremiumPromotionDialog extends StatelessWidget {
           l10n.premiumPromotionMessage,
           textAlign: TextAlign.left,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             height: 1.5,
             color: Colors.black87,
           ),
         ),
         const SizedBox(height: 24),
         PuniButton(
-          text: l10n.premiumPromotionBuyButton,
+          child: Text(
+            l10n.premiumPromotionBuyButton,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           color: PuniButtonColors.pink,
           onPressed: () async {
             // Call purchase
@@ -64,7 +72,14 @@ class PremiumPromotionDialog extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         PuniButton(
-           text: l10n.commonCancel,
+           child: Text(
+             l10n.commonCancel,
+             style: const TextStyle(
+               fontSize: 14,
+               fontWeight: FontWeight.bold,
+               color: Colors.white,
+             ),
+           ),
            color: PuniButtonColors.blueGrey,
            onPressed: () => Navigator.of(context).pop(),
         ),

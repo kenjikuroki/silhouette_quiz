@@ -22,6 +22,7 @@ class FactoryDialog extends StatelessWidget {
   final bool useCelebrationOutline;
   final Color? celebrationTextColor;
   final Color? celebrationOutlineColor;
+  final double? titleFontSize;
 
   const FactoryDialog({
     super.key,
@@ -42,6 +43,7 @@ class FactoryDialog extends StatelessWidget {
     this.useCelebrationOutline = false,
     this.celebrationTextColor,
     this.celebrationOutlineColor,
+    this.titleFontSize,
   });
 
   @override
@@ -192,7 +194,7 @@ class FactoryDialog extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 22 * scale,
+                fontSize: (titleFontSize ?? 22) * scale,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),

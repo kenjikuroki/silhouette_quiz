@@ -551,7 +551,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
       final imageWidget = ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          color: Colors.grey[300], // グレー背景で白いシルエットを見やすく
+          // Background removed for transparency
           child: Image.file(
             file,
             fit: BoxFit.contain,
