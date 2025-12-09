@@ -10,13 +10,15 @@ class FactoryDialog extends StatelessWidget {
   final List<Widget> actions;
   final Widget? icon;
   final bool showCongratulationHeader;
-  final String backgroundAsset;
+  final String? backgroundAsset;
   final Widget? headerImage;
   final bool forceAspectRatio;
   final bool useSparkle;
   final String celebrationTitle;
   final bool hideCelebrationMessage;
   final Color borderColor;
+  final double? celebrationFontSize;
+  final double? messageFontSize;
 
   const FactoryDialog({
     super.key,
@@ -32,11 +34,21 @@ class FactoryDialog extends StatelessWidget {
     this.celebrationTitle = 'よくできました！',
     this.hideCelebrationMessage = false,
     this.borderColor = const Color(0xFF757575),
+    this.celebrationFontSize,
+    this.messageFontSize,
   });
 
   @override
   Widget build(BuildContext context) {
-    Widget child = _buildContent();
+    // Calculate scaling factor based on width
+    // Base width around 800 (standard phone landscape).
+    // iPad 10.2 is 1080px width (logical).
+    // iPad Pro 12.9 is 1366px.
+    // Scale will be applied to fonts and padding.
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double scale = (screenWidth / 600).clamp(1.0, 2.4);
+
+    Widget child = _buildContent(context, scale);
     if (useSparkle) {
       child = SparkleBackground(
         sparkleCount: 30,
@@ -51,44 +63,78 @@ class FactoryDialog extends StatelessWidget {
     }
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: child,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: 24 * scale,
+        vertical: 24 * scale,
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 680),
+        child: child,
+      ),
     );
   }
 
-  Widget _buildContent() {
+  static Future<T?> showFadeDialog<T>({
+    required BuildContext context,
+    required WidgetBuilder builder,
+    bool barrierDismissible = true,
+  }) {
+    return showGeneralDialog<T>(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return builder(context);
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
+        );
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, double scale) {
+    // Pass scale to layouts
     final Widget inner = showCongratulationHeader
-        ? _buildCelebrationLayout()
-        : _buildStandardLayout();
+        ? _buildCelebrationLayout(scale)
+        : _buildStandardLayout(context, scale);
+    
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: const [
+        color: backgroundAsset == null ? Colors.white : null,
+        borderRadius: BorderRadius.circular(32 * scale),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x33000000),
-            blurRadius: 24,
-            offset: Offset(0, 12),
+            color: const Color(0x33000000),
+            blurRadius: 24 * scale,
+            offset: Offset(0, 12 * scale),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(32 * scale),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
+            borderRadius: BorderRadius.circular(32 * scale),
             border: Border.all(
               color: borderColor,
-              width: 6,
+              width: 6 * scale,
             ),
-            image: DecorationImage(
-              image: AssetImage(backgroundAsset),
-              fit: BoxFit.cover,
-            ),
+            image: backgroundAsset != null
+                ? DecorationImage(
+                    image: AssetImage(backgroundAsset!),
+                    fit: BoxFit.cover,
+                  )
+                : null,
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 20,
+            padding: EdgeInsets.symmetric(
+              horizontal: 24 * scale,
+              vertical: 20 * scale,
             ),
             child: inner,
           ),
@@ -97,7 +143,7 @@ class FactoryDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildCelebrationLayout() {
+  Widget _buildCelebrationLayout(double scale) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double imageHeight = constraints.maxHeight * 0.92;
@@ -110,49 +156,58 @@ class FactoryDialog extends StatelessWidget {
           message: hideCelebrationMessage ? '' : message,
           actions: actions,
           enabledNotifier: enabledNotifier,
+          scale: scale,
+          celebrationFontSize: celebrationFontSize,
         );
       },
     );
   }
 
-  Widget _buildStandardLayout() {
+  Widget _buildStandardLayout(BuildContext context, double scale) {
     return Column(
+      mainAxisSize: MainAxisSize.min, // Hug content vertically
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (icon != null) ...[
-          icon!,
-          const SizedBox(height: 16),
+          // Determine if icon is a simple Icon or Image and try to scale?
+          // Since icon is a Widget, we can't easily scale it unless we wrap it.
+          // For now, let's wrap in Transform.scale, or just leave it.
+          // Often icons are sized explicitly. Let's wrap in scale.
+          Transform.scale(scale: scale, child: icon!),
+          SizedBox(height: 16 * scale),
         ],
         if (title.isNotEmpty) ...[
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 22,
+            style: TextStyle(
+              fontSize: 22 * scale,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12 * scale),
         ],
         Text(
           message,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 16,
+          style: TextStyle(
+            fontSize: (messageFontSize ?? 16) * scale,
             color: Colors.black,
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20 * scale),
         Column(
           mainAxisSize: MainAxisSize.min,
           children: actions
               .map(
                 (action) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: SizedBox(
-                    width: 180,
+                  padding: EdgeInsets.symmetric(vertical: 4 * scale),
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      textScaler: TextScaler.linear(scale),
+                    ),
                     child: action,
                   ),
                 ),
@@ -172,6 +227,8 @@ class _CelebrationContent extends StatelessWidget {
   final String message;
   final List<Widget> actions;
   final ValueNotifier<bool> enabledNotifier;
+  final double scale;
+  final double? celebrationFontSize;
 
   const _CelebrationContent({
     required this.imageHeight,
@@ -181,6 +238,8 @@ class _CelebrationContent extends StatelessWidget {
     required this.message,
     required this.actions,
     required this.enabledNotifier,
+    required this.scale,
+    this.celebrationFontSize,
   });
 
   @override
@@ -201,24 +260,25 @@ class _CelebrationContent extends StatelessWidget {
             alignment: const Alignment(0, -0.9),
           child: _buildOutlineText(
             celebrationTitle,
-            fontSize: 32,
-            strokeWidth: 6,
+            fontSize: (celebrationFontSize ?? 24) * scale,
+            strokeWidth: 5 * scale,
             textColor: Colors.black,
             strokeColor: Colors.white,
           ),
         ),
+
         if (icon != null)
           Align(
             alignment: const Alignment(0, -0.1),
-            child: icon!,
+            child: Transform.scale(scale: scale, child: icon!),
           ),
         if (message.isNotEmpty)
         Align(
           alignment: const Alignment(0, 0.35),
           child: _buildOutlineText(
             message,
-            fontSize: 18,
-            strokeWidth: 3,
+            fontSize: 16 * scale,
+            strokeWidth: 3 * scale,
             ),
           ),
         Align(
@@ -231,13 +291,15 @@ class _CelebrationContent extends StatelessWidget {
                 children: actions
                     .map(
                       (Widget action) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: SizedBox(
-                          width: 180,
-                          child: AbsorbPointer(
-                            absorbing: !enabled,
-                            child: Opacity(
-                              opacity: enabled ? 1.0 : 0.4,
+                        padding: EdgeInsets.symmetric(vertical: 4 * scale),
+                        child: AbsorbPointer(
+                          absorbing: !enabled,
+                          child: Opacity(
+                            opacity: enabled ? 1.0 : 0.4,
+                            child: MediaQuery(
+                              data: MediaQuery.of(context).copyWith(
+                                textScaler: TextScaler.linear(scale),
+                              ),
                               child: action,
                             ),
                           ),

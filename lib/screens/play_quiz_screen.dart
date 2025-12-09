@@ -10,7 +10,6 @@ import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/puni_button.dart';
-import '../widgets/audio_toggle_button.dart';
 import '../widgets/factory_dialog.dart';
 import '../services/audio_service.dart';
 import '../widgets/sparkle_background.dart';
@@ -132,14 +131,28 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     // Use local shuffled questions
     if (_questions.isEmpty) {
       return Scaffold(
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/backgrounds/background_quiz.png',
-                fit: BoxFit.cover,
+        body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double w = constraints.maxWidth;
+          final double h = constraints.maxHeight;
+          const double designWidth = 1024;
+          const double designHeight = 768;
+          final double scale = Math.max(w / designWidth, h / designHeight);
+          final double horizontalOffset = (w - designWidth * scale) / 2;
+          final double verticalOffset = (h - designHeight * scale) / 2;
+
+          return Stack(
+            children: [
+              Positioned(
+                left: horizontalOffset,
+                top: verticalOffset,
+                width: designWidth * scale,
+                height: designHeight * scale,
+                child: Image.asset(
+                  'assets/images/backgrounds/background_quiz.png',
+                  fit: BoxFit.fill,
+                ),
               ),
-            ),
             Positioned(
               left: 0,
               right: 0,
@@ -160,8 +173,10 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
               ),
             ),
           ],
-        ),
-      );
+          );
+        },
+      ),
+    );
     }
 
     final bool isLast = _currentIndex == _questions.length - 1;
@@ -171,14 +186,28 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
         _answeredIndices.contains(_currentIndex);
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/backgrounds/background_quiz.png',
-              fit: BoxFit.cover,
-            ),
-          ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double w = constraints.maxWidth;
+          final double h = constraints.maxHeight;
+          const double designWidth = 1024;
+          const double designHeight = 768;
+          final double scale = Math.max(w / designWidth, h / designHeight);
+          final double horizontalOffset = (w - designWidth * scale) / 2;
+          final double verticalOffset = (h - designHeight * scale) / 2;
+
+          return Stack(
+            children: [
+              Positioned(
+                left: horizontalOffset,
+                top: verticalOffset,
+                width: designWidth * scale,
+                height: designHeight * scale,
+                child: Image.asset(
+                  'assets/images/backgrounds/background_quiz.png',
+                  fit: BoxFit.fill,
+                ),
+              ),
           Positioned(
             left: 0,
             right: 0,
@@ -240,13 +269,21 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                               final question = _questions[index];
                               final bool showAnswer = _revealedIndices.contains(index);
                               final bool hasAnswered = _answeredIndices.contains(index);
-                              
+
+                              // 画面サイズに応じてクイズ画像の最大サイズを調整
+                              final Size screenSize = MediaQuery.of(context).size;
+                              final double shortestSide = screenSize.shortestSide;
+                              // 画面の短辺の 60% をベースにして、最小300〜最大520にクランプ
+                              final double baseSize = shortestSide * 0.6;
+                              final double visualSize =
+                                  baseSize.clamp(300.0, 520.0);
+
                               Widget content = Align(
                                 alignment: Alignment.bottomCenter,
                                 child: ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                    maxWidth: 300,
-                                    maxHeight: 300,
+                                  constraints: BoxConstraints(
+                                    maxWidth: visualSize,
+                                    maxHeight: visualSize,
                                   ),
                                   child: AspectRatio(
                                     aspectRatio: 1,
@@ -393,6 +430,8 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
             ),
           ),
         ],
+          );
+        },
       ),
     );
   }
@@ -585,7 +624,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
 
     AudioService.instance.playCheerSound();
 
-    showDialog<void>(
+    FactoryDialog.showFadeDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
@@ -596,6 +635,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
           backgroundAsset: 'assets/images/character/result.png',
           borderColor: const Color(0xFFE49A00),
           celebrationTitle: 'がんばったね！',
+          celebrationFontSize: 20,
           icon: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(total, (int index) {
@@ -606,19 +646,19 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
               final IconData fillIcon = Icons.star;
               final IconData outlineIcon = Icons.star_border;
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
                     const Icon(
                       Icons.star,
                       color: Colors.black,
-                      size: 44,
+                      size: 54,
                     ),
                     Icon(
                       filled ? fillIcon : outlineIcon,
                       color: fillColor,
-                      size: 36,
+                      size: 34,
                     ),
                   ],
                 ),
@@ -626,13 +666,16 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
             }),
           ),
           actions: [
-            PuniButton(
-              text: l10n.commonOk,
-              color: PuniButtonColors.pink,
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                Navigator.of(context).pop();
-              },
+            SizedBox(
+              width: 160,
+              child: PuniButton(
+                text: l10n.commonOk,
+                color: PuniButtonColors.pink,
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
             ),
           ],
         );

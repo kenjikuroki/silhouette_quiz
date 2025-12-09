@@ -14,7 +14,7 @@ class AudioService {
   final AudioPlayer _whistlePlayer = AudioPlayer();
   final AudioPlayer _fallBoxPlayer = AudioPlayer();
   final AudioPlayer _characterChangePlayer = AudioPlayer();
-  String _currentBgmAsset = 'bgm/BGM.mp3';
+  String _currentBgmAsset = '';
   bool _muted = false;
 
   bool _initialized = false;
@@ -23,6 +23,25 @@ class AudioService {
     if (_initialized) {
       return;
     }
+
+    // Configure AudioContext for reliable playback
+    final AudioContext audioContext = AudioContext(
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.ambient,
+        options: [
+          AVAudioSessionOptions.mixWithOthers,
+          AVAudioSessionOptions.defaultToSpeaker
+        ],
+      ),
+      android: AudioContextAndroid(
+        isSpeakerphoneOn: true,
+        stayAwake: true,
+        usageType: AndroidUsageType.media,
+        audioFocus: AndroidAudioFocus.none,
+      ),
+    );
+    await AudioPlayer.global.setAudioContext(audioContext);
+
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.setVolume(0.5);
     await _buttonPlayer.setVolume(0.2);
@@ -33,7 +52,7 @@ class AudioService {
     await _whistlePlayer.setVolume(0.4);
     await _fallBoxPlayer.setVolume(0.5);
     await _characterChangePlayer.setVolume(0.6);
-    await _playBgm('bgm/BGM.mp3');
+    // Do not play BGM here. Let playMainBgm handle it to avoid duplicate calls/race conditions.
     _initialized = true;
   }
 
@@ -116,7 +135,8 @@ class AudioService {
     if (!_initialized) {
       await initialize();
     }
-    if (_currentBgmAsset == 'bgm/quiz.mp3') {
+    // Only skip if already playing the correct asset matches AND player is actually playing
+    if (_currentBgmAsset == 'bgm/quiz.mp3' && _bgmPlayer.state == PlayerState.playing) {
       return;
     }
     await _playBgm('bgm/quiz.mp3');
@@ -126,7 +146,8 @@ class AudioService {
     if (!_initialized) {
       await initialize();
     }
-    if (_currentBgmAsset == 'bgm/BGM.mp3') {
+    // Only skip if already playing the correct asset matches AND player is actually playing
+    if (_currentBgmAsset == 'bgm/BGM.mp3' && _bgmPlayer.state == PlayerState.playing) {
       return;
     }
     await _playBgm('bgm/BGM.mp3');
@@ -137,6 +158,20 @@ class AudioService {
     await _bgmPlayer.stop();
     await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     await _bgmPlayer.play(AssetSource(asset));
+    if (_muted) {
+      await _bgmPlayer.setVolume(0);
+    } else {
+      await _bgmPlayer.setVolume(0.5);
+    }
+  }
+
+  Future<void> pauseBgm() async {
+    await _bgmPlayer.pause();
+  }
+
+  Future<void> resumeBgm() async {
+    await _bgmPlayer.resume();
+    // Ensure volume is restored (just in case)
     if (_muted) {
       await _bgmPlayer.setVolume(0);
     } else {

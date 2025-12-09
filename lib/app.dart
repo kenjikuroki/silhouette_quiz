@@ -27,13 +27,47 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   QuizAppState get appState => widget.appState;
+  bool _hasStartedBgm = false;
+
+  void _startMainBgmIfNeeded() {
+    if (_hasStartedBgm) {
+      return;
+    }
+    _hasStartedBgm = true;
+    AudioService.instance.playMainBgm();
+  }
 
   @override
   void initState() {
     super.initState();
-    AudioService.instance.initialize();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startMainBgmIfNeeded();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (!_hasStartedBgm) {
+      if (state == AppLifecycleState.resumed) {
+        _startMainBgmIfNeeded();
+      }
+      return;
+    }
+    if (state == AppLifecycleState.paused) {
+      AudioService.instance.pauseBgm();
+    } else if (state == AppLifecycleState.resumed) {
+      AudioService.instance.resumeBgm();
+    }
   }
 
   @override

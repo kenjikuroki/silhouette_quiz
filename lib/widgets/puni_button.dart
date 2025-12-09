@@ -26,7 +26,7 @@ class PuniButton extends StatelessWidget {
     required this.onPressed,
     this.color = PuniButtonColors.pink,
     this.textColor = Colors.white,
-    this.padding = const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+    this.padding = const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
     this.borderRadius = 30,
     this.height,
     this.playSound = true,
@@ -37,12 +37,16 @@ class PuniButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool disabled = onPressed == null;
     final Widget buttonChild = child ??
-        Text(
-          text!,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            text!,
+            maxLines: 1,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         );
 

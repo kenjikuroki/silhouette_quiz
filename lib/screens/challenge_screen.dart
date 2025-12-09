@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
@@ -7,7 +8,6 @@ import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/factory_plate_card.dart';
 import '../widgets/puni_button.dart';
-import '../widgets/audio_toggle_button.dart';
 import 'custom_quiz_list_screen.dart';
 import 'play_quiz_screen.dart';
 
@@ -29,15 +29,38 @@ class ChallengeScreen extends StatelessWidget {
         appState.getRecentCustomQuizSets(6);
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/backgrounds/background_wall.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-          SafeArea(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double w = constraints.maxWidth;
+          final double h = constraints.maxHeight;
+          const double designWidth = 1024;
+          const double designHeight = 768;
+          final double scale = max(w / designWidth, h / designHeight);
+          final double horizontalOffset = (w - designWidth * scale) / 2;
+          final double verticalOffset = (h - designHeight * scale) / 2;
+
+          return Stack(
+            children: [
+              Positioned(
+                left: horizontalOffset,
+                top: verticalOffset,
+                width: designWidth * scale,
+                height: designHeight * scale,
+                child: Image.asset(
+                  'assets/images/backgrounds/background_wall.png',
+                  fit: BoxFit.fill,
+                ),
+              ),
+              Positioned(
+                left: horizontalOffset + 40 * scale,
+                bottom: verticalOffset - 180 * scale,
+                width: 320 * scale,
+                child: Image.asset(
+                  'assets/images/character/６.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+              SafeArea(
             child: Stack(
               children: [
                 CenteredLayout(
@@ -169,7 +192,13 @@ class ChallengeScreen extends StatelessWidget {
                                             CustomQuizListScreen.routeName,
                                           );
                                         },
-                                        child: Text(l10n.challengeMoreButton),
+                                        child: Text(
+                                          l10n.challengeMoreButton,
+                                          style: TextStyle(
+                                            fontSize: 18 * scale,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
                                   ],
                                 ),
@@ -186,6 +215,8 @@ class ChallengeScreen extends StatelessWidget {
             ),
           ),
         ],
+          );
+        },
       ),
     );
   }

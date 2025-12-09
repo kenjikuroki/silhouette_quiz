@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
@@ -8,7 +9,6 @@ import '../widgets/corner_back_button.dart';
 import '../widgets/factory_plate_card.dart';
 import '../widgets/factory_dialog.dart';
 import '../widgets/puni_button.dart';
-import '../widgets/audio_toggle_button.dart';
 import 'play_quiz_screen.dart';
 
 class CustomQuizListScreen extends StatelessWidget {
@@ -27,21 +27,35 @@ class CustomQuizListScreen extends StatelessWidget {
     final List<QuizSet> customSets = appState.customQuizSets;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/backgrounds/background_wall.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-          SafeArea(
-            child: Stack(
-              children: [
-                CenteredLayout(
-                  backgroundColor: Colors.transparent,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double w = constraints.maxWidth;
+          final double h = constraints.maxHeight;
+          const double designWidth = 1024;
+          const double designHeight = 768;
+          final double scale = max(w / designWidth, h / designHeight);
+          final double horizontalOffset = (w - designWidth * scale) / 2;
+          final double verticalOffset = (h - designHeight * scale) / 2;
+
+          return Stack(
+            children: [
+              Positioned(
+                left: horizontalOffset,
+                top: verticalOffset,
+                width: designWidth * scale,
+                height: designHeight * scale,
+                child: Image.asset(
+                  'assets/images/backgrounds/background_wall.png',
+                  fit: BoxFit.fill,
+                ),
+              ),
+              SafeArea(
+                child: Stack(
+                  children: [
+                    CenteredLayout(
+                      backgroundColor: Colors.transparent,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
                     itemCount: customSets.length,
                     itemBuilder: (context, index) {
                       final QuizSet set = customSets[index];
@@ -78,28 +92,47 @@ class CustomQuizListScreen extends StatelessWidget {
             ),
           ),
         ],
+          );
+        },
       ),
     );
   }
 
   void _confirmDelete(BuildContext context, String id) async {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final bool? result = await showDialog<bool>(
+    final bool? result = await FactoryDialog.showFadeDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return FactoryDialog(
           title: l10n.deleteQuizConfirmTitle,
           message: l10n.deleteQuizConfirmMessage,
+          backgroundAsset: null,
+          useSparkle: false,
+          forceAspectRatio: false, // Auto height
+          messageFontSize: 13,
+          borderColor: Colors.lightGreen,
           actions: [
-            PuniButton(
-              text: l10n.commonCancel,
-              color: PuniButtonColors.blueGrey,
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-            ),
-            PuniButton(
-              text: l10n.commonDelete,
-              color: PuniButtonColors.pink,
-              onPressed: () => Navigator.of(dialogContext).pop(true),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 120,
+                  child: PuniButton(
+                    text: l10n.commonCancel,
+                    color: PuniButtonColors.blueGrey,
+                    onPressed: () => Navigator.of(dialogContext).pop(false),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                SizedBox(
+                  width: 120,
+                  child: PuniButton(
+                    text: l10n.commonDelete,
+                    color: PuniButtonColors.pink,
+                    onPressed: () => Navigator.of(dialogContext).pop(true),
+                  ),
+                ),
+              ],
             ),
           ],
         );

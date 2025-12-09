@@ -76,7 +76,7 @@ class AppLocalizations {
       // Delete
       'delete_quiz_confirm_title': 'このクイズを けす？',
       'delete_quiz_confirm_message':
-          'このクイズに ふくまれる もんだい は すべて けされます。',
+          'このクイズに ふくまれる もんだい は\nすべて けされます。',
       'common_delete': 'けす',
       'common_cancel': 'やめる',
 

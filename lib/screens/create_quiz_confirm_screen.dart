@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
@@ -6,7 +7,6 @@ import '../state/quiz_app_state.dart';
 import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/puni_button.dart';
-import '../widgets/audio_toggle_button.dart';
 import '../widgets/factory_dialog.dart';
 import '../services/audio_service.dart';
 import 'challenge_screen.dart';
@@ -160,14 +160,28 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
     }
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/backgrounds/background_name.png',
-              fit: BoxFit.cover,
-            ),
-          ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double w = constraints.maxWidth;
+          final double h = constraints.maxHeight;
+          const double designWidth = 1024;
+          const double designHeight = 768;
+          final double scale = max(w / designWidth, h / designHeight);
+          final double horizontalOffset = (w - designWidth * scale) / 2;
+          final double verticalOffset = (h - designHeight * scale) / 2;
+
+          return Stack(
+            children: [
+              Positioned(
+                left: horizontalOffset,
+                top: verticalOffset,
+                width: designWidth * scale,
+                height: designHeight * scale,
+                child: Image.asset(
+                  'assets/images/backgrounds/background_name.png',
+                  fit: BoxFit.fill,
+                ),
+              ),
           // Removed piping.png
           Positioned(
             bottom: -60,
@@ -349,7 +363,8 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                                   AudioService.instance
                                                       .playCheerSound();
 
-                                                  await showDialog<void>(
+                                                  await FactoryDialog
+                                                      .showFadeDialog<void>(
                                                     context: context,
                                                     barrierDismissible:
                                                         false,
@@ -376,19 +391,17 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                                             true,
                                                         useSparkle: false,
                                                         actions: [
-                                                          PuniButton(
-                                                            text: l10n
-                                                                  .commonOk,
-                                                              color:
-                                                                  PuniButtonColors
-                                                                      .pink,
+                                                          SizedBox(
+                                                            width: 160,
+                                                            child: PuniButton(
+                                                              text: l10n.commonOk,
+                                                              color: PuniButtonColors.pink,
                                                               onPressed: () {
-                                                                Navigator.of(
-                                                                        dialogContext)
-                                                                    .pop();
+                                                                Navigator.of(dialogContext).pop();
                                                               },
                                                             ),
-                                                          ],
+                                                          ),
+                                                        ],
                                                         );
                                                       },
                                                     );
@@ -459,6 +472,8 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
             ),
           ),
         ],
+          );
+        },
       ),
     );
   }

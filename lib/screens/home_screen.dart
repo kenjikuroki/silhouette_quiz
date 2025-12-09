@@ -37,11 +37,14 @@ class _HomeScreenState extends State<HomeScreen>
   // 追加: 縦に伸び縮みするアニメーション用
   late final AnimationController _stretchController;
   late final Animation<double> _stretchAnimation;
+  bool _hasRequestedInitialBgm = false;
 
   bool _isChangingCharacter = false;
   bool _shouldAnimateCharacter = false;
   bool _isChallengePressed = false;
   bool _isCreatePressed = false;
+
+  String _helperCharacterImage = 'assets/images/character/３.png';
 
   final List<String> _characterImages = [
     'assets/images/character/character.png',
@@ -75,6 +78,28 @@ class _HomeScreenState extends State<HomeScreen>
     _stretchAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _stretchController, curve: Curves.easeInOut),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_hasRequestedInitialBgm) {
+        _hasRequestedInitialBgm = true;
+        AudioService.instance.playMainBgm();
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(
+        const AssetImage('assets/images/button/challenge_bo.png'), context);
+    precacheImage(
+        const AssetImage('assets/images/button/challenge_bo_P.png'), context);
+    precacheImage(
+        const AssetImage('assets/images/button/myself_right_bo.png'), context);
+    precacheImage(
+        const AssetImage('assets/images/button/myself_left_bo.png'), context);
+    precacheImage(const AssetImage('assets/images/character/３.png'), context);
+    precacheImage(const AssetImage('assets/images/character/４.png'), context);
+    precacheImage(const AssetImage('assets/images/character/５.png'), context);
   }
 
   @override
@@ -129,6 +154,7 @@ class _HomeScreenState extends State<HomeScreen>
       _shouldAnimateCharacter = false;
       _isChallengePressed = false;
       _isCreatePressed = false;
+      _helperCharacterImage = 'assets/images/character/３.png';
     });
     // アニメーションリセット
     _swayController.stop();
@@ -156,6 +182,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (_isChallengePressed || _isCreatePressed) return;
     setState(() {
       _isChallengePressed = true;
+      _helperCharacterImage = 'assets/images/character/４.png';
     });
     AudioService.instance.playChallengeSound();
     await Future.delayed(const Duration(seconds: 1));
@@ -173,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (_isCreatePressed || _isChallengePressed) return;
     setState(() {
       _isCreatePressed = true;
+      _helperCharacterImage = 'assets/images/character/５.png';
     });
     AudioService.instance.playLeverSound();
     await Future.delayed(const Duration(seconds: 1));
@@ -200,36 +228,97 @@ class _HomeScreenState extends State<HomeScreen>
 
           const double designWidth = 1024;
           const double designHeight = 768;
-          const double challengeLeft = 170;
-          const double challengeBottom = 110;
-          const double challengeWidth = 440;
-          const double createLeft = 480;
-          const double createBottom = 140;
-          const double createWidth = 360;
+          const double challengeLeft = 240;
+          const double challengeBottom = 190;
+          const double challengeWidth = 360;
+          const double createLeft = 490;
+          const double createBottom = 220;
+          const double createWidth = 280;
 
-          final double scale =
-              min(w / designWidth, h / designHeight).clamp(0.5, 1.2);
+          // ★ 画面いっぱいに広がる「cover」と同じ計算に変更（max を使う）
+          final double scale = max(w / designWidth, h / designHeight);
+
+          // cover した時の 1024x768 キャンバスが、画面内でどこに来るか
           final double horizontalOffset = (w - designWidth * scale) / 2;
           final double verticalOffset = (h - designHeight * scale) / 2;
-          final bool isMobile = w < 1200;
-          final double challengeBottomPos = isMobile
-              ? h * 0.03
-              : verticalOffset + (challengeBottom - 60) * scale;
-          final double createBottomPos = isMobile
-              ? h * 0.06
-              : verticalOffset + (createBottom - 60) * scale;
+
+          // モバイル判定はやめて、常に同じロジックで bottom を出す
+          final double challengeBottomPos =
+              verticalOffset + (challengeBottom - 60) * scale;
+          final double createBottomPos =
+              verticalOffset + (createBottom - 60) * scale;
 
           return Stack(
             children: [
-              Positioned.fill(
+              Positioned(
+                left: horizontalOffset,
+                top: verticalOffset,
+                width: designWidth * scale,
+                height: designHeight * scale,
                 child: GestureDetector(
                   onTap: _dropCharacter,
                   child: Image.asset(
                     'assets/images/backgrounds/background.png',
-                    fit: BoxFit.cover,
+                    // ここはもう自前で width/height を指定しているので fill でOK
+                    fit: BoxFit.fill,
                   ),
                 ),
+                ),
+
+
+              // Helper Character (3/4/5) - Behind buttons
+              // 5: Square (668x668) -> Width 420, Left -50
+              // 4: Tall (~500x700) -> Width 380, Left -30 (User requested larger & left & slow move)
+              // 3: Tall (~500x700) -> Width 320, Left 0 (Default)
+              Builder(
+                builder: (context) {
+                  double targetWidth = 320;
+                  double targetLeftOffset = 0;
+                  Duration posDuration = Duration.zero;
+                  Duration sizeDuration = Duration.zero;
+                  
+                  if (_helperCharacterImage.contains('５')) {
+                    // 5: Large instantly, Moves left slowly
+                    targetWidth = 460;
+                    targetLeftOffset = -60;
+                    posDuration = const Duration(milliseconds: 1000);
+                    sizeDuration = Duration.zero;
+                  } else if (_helperCharacterImage.contains('４')) {
+                    // 4: Grows slowly, No slide (keep Left 0)
+                    targetWidth = 380; 
+                    targetLeftOffset = 0; // Don't move left to avoid slide
+                    posDuration = Duration.zero;
+                    sizeDuration = const Duration(milliseconds: 1000);
+                  } else {
+                    // 3: Reset instantly
+                    targetWidth = 320;
+                    targetLeftOffset = 0;
+                    posDuration = Duration.zero;
+                    sizeDuration = Duration.zero;
+                  }
+
+                  final double charWidth = targetWidth * scale;
+                  final double charLeft = horizontalOffset + targetLeftOffset * scale;
+                  final double charBottom = verticalOffset - 30 * scale;
+
+                  return AnimatedPositioned(
+                    duration: posDuration,
+                    curve: Curves.easeInOut,
+                    left: charLeft,
+                    bottom: charBottom,
+                    child: AnimatedContainer(
+                      duration: sizeDuration,
+                      curve: Curves.easeInOut,
+                      width: charWidth,
+                      child: Image.asset(
+                        _helperCharacterImage,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  );
+                }
               ),
+
               Positioned(
                 left: horizontalOffset + challengeLeft * scale,
                 bottom: challengeBottomPos,
@@ -296,6 +385,8 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
               ),
+
+
             ],
           );
         },

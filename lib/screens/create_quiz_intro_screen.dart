@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
@@ -6,7 +7,6 @@ import '../widgets/centered_layout.dart';
 import '../widgets/corner_back_button.dart';
 import '../widgets/puff_route.dart';
 import '../widgets/puni_button.dart';
-import '../widgets/audio_toggle_button.dart';
 import 'create_quiz_capture_screen.dart';
 
 class CreateQuizIntroScreen extends StatelessWidget {
@@ -24,15 +24,29 @@ class CreateQuizIntroScreen extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/backgrounds/backgrround_start.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-          SafeArea(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double w = constraints.maxWidth;
+          final double h = constraints.maxHeight;
+          const double designWidth = 1024;
+          const double designHeight = 768;
+          final double scale = max(w / designWidth, h / designHeight);
+          final double horizontalOffset = (w - designWidth * scale) / 2;
+          final double verticalOffset = (h - designHeight * scale) / 2;
+
+          return Stack(
+            children: [
+              Positioned(
+                left: horizontalOffset,
+                top: verticalOffset,
+                width: designWidth * scale,
+                height: designHeight * scale,
+                child: Image.asset(
+                  'assets/images/backgrounds/backgrround_start.png',
+                  fit: BoxFit.fill,
+                ),
+              ),
+              SafeArea(
             child: Stack(
               children: [
                 CenteredLayout(
@@ -92,6 +106,8 @@ class CreateQuizIntroScreen extends StatelessWidget {
             ),
           ),
         ],
+          );
+        },
       ),
     );
   }
