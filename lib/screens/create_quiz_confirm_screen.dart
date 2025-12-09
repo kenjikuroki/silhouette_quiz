@@ -453,6 +453,9 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                                             'かんせい！',
                                                         hideCelebrationMessage:
                                                             true,
+                                                        useCelebrationOutline: true,
+                                                        celebrationTextColor: Colors.white,
+                                                        celebrationOutlineColor: Colors.black,
                                                         useSparkle: false,
                                                         actions: [
                                                           SizedBox(

@@ -20,6 +20,8 @@ class FactoryDialog extends StatelessWidget {
   final double? celebrationFontSize;
   final double? messageFontSize;
   final bool useCelebrationOutline;
+  final Color? celebrationTextColor;
+  final Color? celebrationOutlineColor;
 
   const FactoryDialog({
     super.key,
@@ -38,6 +40,8 @@ class FactoryDialog extends StatelessWidget {
     this.celebrationFontSize,
     this.messageFontSize,
     this.useCelebrationOutline = false,
+    this.celebrationTextColor,
+    this.celebrationOutlineColor,
   });
 
   @override
@@ -161,6 +165,8 @@ class FactoryDialog extends StatelessWidget {
           scale: scale,
           celebrationFontSize: celebrationFontSize,
           useCelebrationOutline: useCelebrationOutline,
+          celebrationTextColor: celebrationTextColor,
+          celebrationOutlineColor: celebrationOutlineColor,
         );
       },
     );
@@ -237,6 +243,8 @@ class _CelebrationContent extends StatelessWidget {
   final double scale;
   final double? celebrationFontSize;
   final bool useCelebrationOutline;
+  final Color? celebrationTextColor;
+  final Color? celebrationOutlineColor;
 
   const _CelebrationContent({
     required this.imageHeight,
@@ -249,6 +257,8 @@ class _CelebrationContent extends StatelessWidget {
     required this.scale,
     this.celebrationFontSize,
     required this.useCelebrationOutline,
+    this.celebrationTextColor,
+    this.celebrationOutlineColor,
   });
 
   @override
@@ -272,8 +282,8 @@ class _CelebrationContent extends StatelessWidget {
                   celebrationTitle,
                   fontSize: (celebrationFontSize ?? 24) * scale,
                   strokeWidth: 5 * scale,
-                  textColor: Colors.black,
-                  strokeColor: Colors.white,
+                  textColor: celebrationTextColor ?? Colors.black,
+                  strokeColor: celebrationOutlineColor ?? Colors.white,
                 )
               : Text(
                   celebrationTitle,
@@ -281,7 +291,7 @@ class _CelebrationContent extends StatelessWidget {
                   style: TextStyle(
                     fontSize: (celebrationFontSize ?? 24) * scale,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: celebrationTextColor ?? Colors.black,
                   ),
                 ),
         ),
