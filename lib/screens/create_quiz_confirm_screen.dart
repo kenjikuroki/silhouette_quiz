@@ -54,6 +54,12 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
   late AnimationController _conveyorShakeController;
   late Animation<Offset> _conveyorShakeAnimation;
 
+  late AnimationController _characterFadeController;
+  late Animation<double> _characterFadeAnimation;
+
+  late AnimationController _lieSlideController;
+  late Animation<Offset> _lieSlideAnimation;
+
   QuizAppState get appState => widget.appState;
 
   @override
@@ -101,7 +107,7 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
 
     // Box Slide (Exit): 2s
     _boxSlideController = AnimationController(
-       duration: const Duration(seconds: 2),
+       duration: const Duration(milliseconds: 3600), // Adjusted to match lie.png speed
        vsync: this,
     );
     _boxSlideAnimation = Tween<Offset>(
@@ -121,6 +127,28 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
       begin: Offset.zero,
       end: const Offset(0, 0.05), // Small vertical shake
     ).animate(_conveyorShakeController);
+
+    // Character Fade (8.png): 0.8s
+    _characterFadeController = AnimationController(
+       duration: const Duration(milliseconds: 800),
+       vsync: this,
+    );
+    _characterFadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _characterFadeController, curve: Curves.easeInOut),
+    );
+
+    // Lie Slide (lie.png): 2.5s (Slower/Longer to cross screen)
+    _lieSlideController = AnimationController(
+       duration: const Duration(milliseconds: 5000),
+       vsync: this,
+    );
+    _lieSlideAnimation = Tween<Offset>(
+      begin: const Offset(-0.5, 0), // Start from left off-screen/edge
+      end: const Offset(1.5, 0),   // End right off-screen
+    ).animate(CurvedAnimation(
+      parent: _lieSlideController,
+      curve: Curves.easeInOut,
+    ));
 
     // Start drop animation with 0.5s delay
     Future.delayed(const Duration(milliseconds: 500), () {
@@ -143,6 +171,8 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
     _boxDropController.dispose();
     _boxSlideController.dispose();
     _conveyorShakeController.dispose();
+    _characterFadeController.dispose();
+    _lieSlideController.dispose();
     super.dispose();
   }
 
@@ -182,6 +212,19 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                   fit: BoxFit.fill,
                 ),
               ),
+              // 8.png (Behind conveyor, Right side)
+              Positioned(
+                bottom: h * 0.15, // Adjust vertical position
+                right: w * 0.1,  // Right side
+                height: h * 0.6, // Size (Doubled)
+                child: FadeTransition(
+                  opacity: _characterFadeAnimation,
+                  child: Image.asset(
+                    'assets/images/character/8.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
           // Removed piping.png
           Positioned(
             bottom: -60,
@@ -192,6 +235,23 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
               child: Image.asset(
                 'assets/images/conveyor_y.png',
                 fit: BoxFit.fitWidth,
+              ),
+            ),
+          ),
+          // lie.png (Moved to be ABOVE/After conveyor)
+          Positioned(
+            bottom: h * 0.12, // Same vertical pos
+            left: 0,
+            right: 0,
+            child: SlideTransition(
+              position: _lieSlideAnimation,
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: Image.asset(
+                  'assets/images/character/lie.png',
+                  height: h * 0.5,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
@@ -338,6 +398,10 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                                     _conveyorShakeController
                                                         .repeat(reverse: true);
                                                     _boxSlideController
+                                                        .forward();
+                                                    _characterFadeController
+                                                        .forward();
+                                                    _lieSlideController
                                                         .forward();
 
                                                     await Future.wait([

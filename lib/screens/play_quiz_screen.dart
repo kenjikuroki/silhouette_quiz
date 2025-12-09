@@ -13,6 +13,7 @@ import '../widgets/puni_button.dart';
 import '../widgets/factory_dialog.dart';
 import '../services/audio_service.dart';
 import '../widgets/sparkle_background.dart';
+import '../widgets/background_character_layer.dart';
 
 class PlayQuizArguments {
   final String quizSetId;
@@ -208,8 +209,9 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                   fit: BoxFit.fill,
                 ),
               ),
-          Positioned(
-            left: 0,
+              BackgroundCharacterLayer(currentIndex: _currentIndex),
+              Positioned(
+                left: 0,
             right: 0,
             bottom: 0,
             child: AnimatedBuilder(
@@ -636,6 +638,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
           borderColor: const Color(0xFFE49A00),
           celebrationTitle: 'がんばったね！',
           celebrationFontSize: 20,
+          useCelebrationOutline: true,
           icon: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(total, (int index) {

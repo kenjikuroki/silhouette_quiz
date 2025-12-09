@@ -10,6 +10,8 @@ import '../widgets/factory_plate_card.dart';
 import '../widgets/puni_button.dart';
 import 'custom_quiz_list_screen.dart';
 import 'play_quiz_screen.dart';
+import 'create_quiz_intro_screen.dart';
+import '../widgets/premium_promotion_dialog.dart';
 
 class ChallengeScreen extends StatelessWidget {
   static const String routeName = '/challenge';
@@ -64,7 +66,7 @@ class ChallengeScreen extends StatelessWidget {
             child: Stack(
               children: [
                 CenteredLayout(
-                  maxContentWidth: double.infinity,
+                  maxContentWidth: 900,
                   backgroundColor: Colors.transparent,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -94,18 +96,28 @@ class ChallengeScreen extends StatelessWidget {
                                 child: ListView(
                                   children: defaultSets
                                       .map(
-                                        (set) => FactoryPlateCard(
-                                          onTap: () {
-                                            Navigator.of(context).pushNamed(
-                                              PlayQuizScreen.routeName,
-                                              arguments: PlayQuizArguments(
-                                                  quizSetId: set.id),
-                                            );
-                                          },
-                                          child: ListTile(
-                                            title: Text(set.title),
-                                          ),
-                                        ),
+                                        (set) {
+                                          final bool isFree = ['animal_1', 'food_1', 'vehicle_1'].contains(set.id);
+                                          final bool isLocked = !isFree && !appState.isFullVersionPurchased;
+
+                                          return FactoryPlateCard(
+                                            onTap: () {
+                                              if (isLocked) {
+                                                PremiumPromotionDialog.show(context, appState);
+                                              } else {
+                                                Navigator.of(context).pushNamed(
+                                                  PlayQuizScreen.routeName,
+                                                  arguments: PlayQuizArguments(
+                                                      quizSetId: set.id),
+                                                );
+                                              }
+                                            },
+                                            child: ListTile(
+                                              title: Text(set.title),
+                                              trailing: isLocked ? const Icon(Icons.lock, color: Colors.grey) : null,
+                                            ),
+                                          );
+                                        },
                                       )
                                       .toList(),
                                 ),
@@ -184,6 +196,26 @@ class ChallengeScreen extends StatelessWidget {
                                             ),
                                           );
                                         },
+                                      ),
+                                    if (appState.customQuizSets.length >= 2 && !appState.isFullVersionPurchased)
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(vertical: 8 * scale),
+                                        child: Center(
+                                          child: IconButton(
+                                            icon: const Icon(Icons.add_circle),
+                                            color: Colors.green.shade800,
+                                            iconSize: 48 * scale,
+                                            onPressed: () {
+                                              if (!appState.isFullVersionPurchased) {
+                                                PremiumPromotionDialog.show(context, appState);
+                                              } else {
+                                                Navigator.of(context).pushNamed(
+                                                  CreateQuizIntroScreen.routeName,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ),
                                       ),
                                     if (appState.customQuizSets.isNotEmpty)
                                       TextButton(

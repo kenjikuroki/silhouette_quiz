@@ -8,6 +8,7 @@ import '../widgets/audio_toggle_button.dart';
 import '../services/audio_service.dart';
 import 'challenge_screen.dart';
 import 'create_quiz_intro_screen.dart';
+import '../widgets/premium_promotion_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = '/';
@@ -110,6 +111,22 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
+  Alignment _getDropAlignment(String imagePath) {
+    bool isTablet = false;
+    if (mounted) {
+       isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    }
+
+    if (imagePath.contains('hime') ||
+        imagePath.contains('kaiju') ||
+        imagePath.contains('kuma')) {
+      // iPad: Slightly higher than default (-0.1) but lower than Phone (-0.35)
+      // Phone: Keep -0.35
+      return Alignment(0, isTablet ? -0.15 : -0.35); 
+    }
+    return _dropAlignment;
+  }
+
   void _changeCharacter() {
     if (_hasChangedCharacter || _isChangingCharacter) return;
 
@@ -134,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen>
         } while (nextImage == _currentCharacterImage);
         _currentCharacterImage = nextImage;
         _hasChangedCharacter = true;
-        _characterAlignment = _dropAlignment;
+        _characterAlignment = _getDropAlignment(nextImage);
         _shouldAnimateCharacter = false;
         AudioService.instance.playCharacterPopSound();
       });
@@ -164,8 +181,10 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _dropCharacter() {
+    final targetAlign = _getDropAlignment(_currentCharacterImage);
+    if (_characterAlignment == targetAlign) return;
     setState(() {
-      _characterAlignment = _dropAlignment;
+      _characterAlignment = targetAlign;
       _shouldAnimateCharacter = true;
     });
     AudioService.instance.playWhistleSound();
@@ -198,6 +217,14 @@ class _HomeScreenState extends State<HomeScreen>
 
   Future<void> _onCreatePressed() async {
     if (_isCreatePressed || _isChallengePressed) return;
+
+    // Check limit
+    final appState = widget.appState;
+    if (!appState.isFullVersionPurchased && appState.customQuizSets.length >= 2) {
+      await PremiumPromotionDialog.show(context, appState);
+      return;
+    }
+
     setState(() {
       _isCreatePressed = true;
       _helperCharacterImage = 'assets/images/character/５.png';
@@ -356,32 +383,43 @@ class _HomeScreenState extends State<HomeScreen>
                 onEnd: _onDropFinished,
                 child: GestureDetector(
                   onTap: _changeCharacter,
-                  child: ScaleTransition(
-                    scale: _stretchAnimation,
-                    alignment: Alignment.bottomCenter,
-                    child: RotationTransition(
-                      // まだキャラクターが変わっていない時（最初のキャラ）は揺れない
-                      turns: _hasChangedCharacter
-                          ? _swayAnimation
-                          : const AlwaysStoppedAnimation(0),
-                      alignment: Alignment.bottomCenter,
-                      child: AnimatedBuilder(
-                        animation: _shakeController,
-                        builder: (context, child) {
-                          final double dx =
-                              sin(_shakeController.value * 2 * pi) * 8;
-                          return Transform.translate(
-                            offset: Offset(dx, 0),
-                            child: child,
-                          );
-                        },
-                        child: Image.asset(
-                          _currentCharacterImage,
-                          width: w * 0.5, // 0.635 -> 0.5 に縮小
-                          fit: BoxFit.contain,
+                  child: Builder(
+                    builder: (context) {
+                      final bool isMainCharacter =
+                          _currentCharacterImage.contains('character.png');
+                      return ScaleTransition(
+                        scale: isMainCharacter
+                            ? _stretchAnimation
+                            : const AlwaysStoppedAnimation(1.0),
+                        alignment: Alignment.bottomCenter,
+                        child: RotationTransition(
+                          turns: (_hasChangedCharacter && isMainCharacter)
+                              ? _swayAnimation
+                              : const AlwaysStoppedAnimation(0),
+                          alignment: Alignment.bottomCenter,
+                          child: AnimatedBuilder(
+                            animation: _shakeController,
+                            builder: (context, child) {
+                              final double dx =
+                                  sin(_shakeController.value * 2 * pi) * 8;
+                              return Transform.translate(
+                                offset: Offset(dx, 0),
+                                child: child,
+                              );
+                            },
+                            child: Image.asset(
+                              _currentCharacterImage,
+                              width: (_currentCharacterImage.contains('hime') ||
+                                      _currentCharacterImage.contains('kaiju') ||
+                                      _currentCharacterImage.contains('kuma'))
+                                  ? w * 0.18
+                                  : w * 0.5,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
               ),

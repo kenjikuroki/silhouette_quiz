@@ -18,7 +18,7 @@ class QuizAppState extends ChangeNotifier {
   final PurchaseService purchaseService = PurchaseService();
   final SilhouetteService silhouetteService = SilhouetteService();
 
-  static const int freeCustomQuizLimit = 3;
+  static const int freeCustomQuizLimit = 2;
 
   List<QuizSet> get defaultQuizSets => List.unmodifiable(_defaultQuizSets);
   List<QuizSet> get customQuizSets => _customQuizBox.values.toList().cast<QuizSet>().reversed.toList();

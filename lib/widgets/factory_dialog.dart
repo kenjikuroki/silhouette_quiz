@@ -19,6 +19,7 @@ class FactoryDialog extends StatelessWidget {
   final Color borderColor;
   final double? celebrationFontSize;
   final double? messageFontSize;
+  final bool useCelebrationOutline;
 
   const FactoryDialog({
     super.key,
@@ -36,6 +37,7 @@ class FactoryDialog extends StatelessWidget {
     this.borderColor = const Color(0xFF757575),
     this.celebrationFontSize,
     this.messageFontSize,
+    this.useCelebrationOutline = false,
   });
 
   @override
@@ -158,63 +160,68 @@ class FactoryDialog extends StatelessWidget {
           enabledNotifier: enabledNotifier,
           scale: scale,
           celebrationFontSize: celebrationFontSize,
+          useCelebrationOutline: useCelebrationOutline,
         );
       },
     );
   }
 
   Widget _buildStandardLayout(BuildContext context, double scale) {
-    return Column(
-      mainAxisSize: MainAxisSize.min, // Hug content vertically
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        if (icon != null) ...[
-          // Determine if icon is a simple Icon or Image and try to scale?
-          // Since icon is a Widget, we can't easily scale it unless we wrap it.
-          // For now, let's wrap in Transform.scale, or just leave it.
-          // Often icons are sized explicitly. Let's wrap in scale.
-          Transform.scale(scale: scale, child: icon!),
-          SizedBox(height: 16 * scale),
-        ],
-        if (title.isNotEmpty) ...[
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 22 * scale,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // Hug content vertically
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (icon != null) ...[
+            // Determine if icon is a simple Icon or Image and try to scale?
+            // Since icon is a Widget, we can't easily scale it unless we wrap it.
+            // For now, let's wrap in Transform.scale, or just leave it.
+            // Often icons are sized explicitly. Let's wrap in scale.
+            Transform.scale(scale: scale, child: icon!),
+            SizedBox(height: 16 * scale),
+          ],
+          if (title.isNotEmpty) ...[
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 22 * scale,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
-          ),
-          SizedBox(height: 12 * scale),
-        ],
-        Text(
-          message,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: (messageFontSize ?? 16) * scale,
-            color: Colors.black,
-          ),
-        ),
-        SizedBox(height: 20 * scale),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: actions
-              .map(
-                (action) => Padding(
-                  padding: EdgeInsets.symmetric(vertical: 4 * scale),
-                  child: MediaQuery(
-                    data: MediaQuery.of(context).copyWith(
-                      textScaler: TextScaler.linear(scale),
+            SizedBox(height: 12 * scale),
+          ],
+          if (message.isNotEmpty) ...[
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: (messageFontSize ?? 16) * scale,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 20 * scale),
+          ],
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: actions
+                .map(
+                  (action) => Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4 * scale),
+                    child: MediaQuery(
+                      data: MediaQuery.of(context).copyWith(
+                        textScaler: TextScaler.linear(scale),
+                      ),
+                      child: action,
                     ),
-                    child: action,
                   ),
-                ),
-              )
-              .toList(),
-        ),
-      ],
+                )
+                .toList(),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -229,6 +236,7 @@ class _CelebrationContent extends StatelessWidget {
   final ValueNotifier<bool> enabledNotifier;
   final double scale;
   final double? celebrationFontSize;
+  final bool useCelebrationOutline;
 
   const _CelebrationContent({
     required this.imageHeight,
@@ -240,6 +248,7 @@ class _CelebrationContent extends StatelessWidget {
     required this.enabledNotifier,
     required this.scale,
     this.celebrationFontSize,
+    required this.useCelebrationOutline,
   });
 
   @override
@@ -258,13 +267,23 @@ class _CelebrationContent extends StatelessWidget {
           ),
         Align(
             alignment: const Alignment(0, -0.9),
-          child: _buildOutlineText(
-            celebrationTitle,
-            fontSize: (celebrationFontSize ?? 24) * scale,
-            strokeWidth: 5 * scale,
-            textColor: Colors.black,
-            strokeColor: Colors.white,
-          ),
+          child: useCelebrationOutline
+              ? _buildOutlineText(
+                  celebrationTitle,
+                  fontSize: (celebrationFontSize ?? 24) * scale,
+                  strokeWidth: 5 * scale,
+                  textColor: Colors.black,
+                  strokeColor: Colors.white,
+                )
+              : Text(
+                  celebrationTitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: (celebrationFontSize ?? 24) * scale,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
         ),
 
         if (icon != null)

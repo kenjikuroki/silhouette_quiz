@@ -87,6 +87,11 @@ class AppLocalizations {
       'paywall_buy_button': '100円で かう',
       'paywall_later_button': 'あとで',
 
+      // Premium Promotion
+      'premium_promotion_title': 'プレミアム版のお知らせ',
+      'premium_promotion_message': '・ロック中の3つのカテゴリであそべるようになります。\n・自分で作れるクイズリストを3つ以上作成できます。\n・一度の購入で、ずっと使えます。',
+      'premium_promotion_buy_button': '100円でプレミアム版を購入',
+
       // Common
       'common_ok': 'OK',
     },
@@ -175,6 +180,10 @@ class AppLocalizations {
   String get paywallMessage => _translate('paywall_message');
   String get paywallBuyButton => _translate('paywall_buy_button');
   String get paywallLaterButton => _translate('paywall_later_button');
+
+  String get premiumPromotionTitle => _translate('premium_promotion_title');
+  String get premiumPromotionMessage => _translate('premium_promotion_message');
+  String get premiumPromotionBuyButton => _translate('premium_promotion_buy_button');
 
   String get commonOk => _translate('common_ok');
 
