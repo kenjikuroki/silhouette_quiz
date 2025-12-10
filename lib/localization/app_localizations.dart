@@ -92,6 +92,19 @@ class AppLocalizations {
       'premium_promotion_message': '・ロック中の3つのカテゴリであそべるようになります。\n・自分で作れるクイズリストを3つ以上作成できます。\n・一度の購入で、ずっと使えます。',
       'premium_promotion_buy_button': '100円でプレミアム版を購入',
 
+      'premium_promotion_message': '・ロック中の3つのカテゴリであそべるようになります。\n・自分で作れるクイズリストを3つ以上作成できます。\n・一度の購入で、ずっと使えます。',
+      'premium_promotion_buy_button': '100円でプレミアム版を購入',
+      'purchase_complete_title': 'ありがとう！',
+      'purchase_complete_message': 'プレミアム版になったよ！\nたくさんクイズをつくってね！',
+      'purchase_complete_celebration': 'ありがとう！',
+
+      'purchase_complete_celebration': 'ありがとう！',
+
+      // Parental Gate
+      'parental_gate_title': '保護者の方へ',
+      'parental_gate_message': '問題の答えは？',
+      'parental_gate_failed': 'ちがいます',
+
       // Common
       'common_ok': 'OK',
     },
@@ -184,6 +197,14 @@ class AppLocalizations {
   String get premiumPromotionTitle => _translate('premium_promotion_title');
   String get premiumPromotionMessage => _translate('premium_promotion_message');
   String get premiumPromotionBuyButton => _translate('premium_promotion_buy_button');
+
+  String get purchaseCompleteTitle => _translate('purchase_complete_title');
+  String get purchaseCompleteMessage => _translate('purchase_complete_message');
+  String get purchaseCompleteCelebration => _translate('purchase_complete_celebration');
+
+  String get parentalGateTitle => _translate('parental_gate_title');
+  String get parentalGateMessage => _translate('parental_gate_message');
+  String get parentalGateFailed => _translate('parental_gate_failed');
 
   String get commonOk => _translate('common_ok');
 

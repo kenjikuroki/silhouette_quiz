@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
 import '../state/quiz_app_state.dart';
 import 'factory_dialog.dart';
+import 'parental_gate_dialog.dart';
 import 'puni_button.dart';
 
 class PremiumPromotionDialog extends StatelessWidget {
@@ -11,9 +12,40 @@ class PremiumPromotionDialog extends StatelessWidget {
   const PremiumPromotionDialog({super.key, required this.appState});
 
   static Future<void> show(BuildContext context, QuizAppState appState) async {
-    await FactoryDialog.showFadeDialog(
+    final bool? result = await FactoryDialog.showFadeDialog<bool>(
       context: context,
       builder: (context) => PremiumPromotionDialog(appState: appState),
+    );
+
+    if (result == true && context.mounted) {
+        await _showThankYouDialog(context);
+    }
+  }
+
+  static Future<void> _showThankYouDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    await FactoryDialog.showFadeDialog(
+      context: context,
+      builder: (context) => FactoryDialog(
+        title: l10n.purchaseCompleteTitle,
+        message: l10n.purchaseCompleteMessage,
+        showCongratulationHeader: true,
+        backgroundAsset: 'assets/images/character/completion.png',
+        celebrationTitle: l10n.purchaseCompleteCelebration,
+        celebrationFontSize: 20,
+        useCelebrationOutline: true,
+        useSparkle: true,
+        actions: [
+          SizedBox(
+            width: 160,
+            child: PuniButton(
+              text: l10n.commonOk,
+              color: PuniButtonColors.pink,
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -60,10 +92,14 @@ class PremiumPromotionDialog extends StatelessWidget {
           ),
           color: PuniButtonColors.pink,
           onPressed: () async {
+            // Parental Gate
+            final bool authorized = await ParentalGateDialog.show(context);
+            if (!authorized || !context.mounted) return;
+
             // Call purchase
             final success = await appState.purchaseService.purchaseFullVersion();
             if (context.mounted) {
-              Navigator.of(context).pop(); // Close dialog
+              Navigator.of(context).pop(success); // Close dialog with result
               if (success) {
                   appState.notifyListeners(); // Ensure UI updates
               }

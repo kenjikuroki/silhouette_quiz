@@ -113,6 +113,12 @@ class QuizAppState extends ChangeNotifier {
             originalImagePath: 'assets/images/quiz/food/apple.png',
             answerText: 'りんご|あっぷる|apple',
           ),
+          QuizQuestion(
+            id: 'food_banana',
+            silhouetteImagePath: 'assets/images/quiz/food/banana_b.png',
+            originalImagePath: 'assets/images/quiz/food/banana.png',
+            answerText: 'ばなな|ばなな|banana',
+          ),
 
           QuizQuestion(
             id: 'food_candy',

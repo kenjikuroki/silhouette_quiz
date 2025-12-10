@@ -304,12 +304,14 @@ class _CelebrationContent extends StatelessWidget {
             child: Transform.scale(scale: scale, child: icon!),
           ),
         if (message.isNotEmpty)
-        Align(
-          alignment: const Alignment(0, 0.35),
-          child: _buildOutlineText(
-            message,
-            fontSize: 16 * scale,
-            strokeWidth: 3 * scale,
+          Align(
+            alignment: (headerImage == null && icon == null)
+                ? const Alignment(0, -0.4)
+                : const Alignment(0, 0.35),
+            child: _buildOutlineText(
+              message,
+              fontSize: 16 * scale,
+              strokeWidth: 3 * scale,
             ),
           ),
         Align(
