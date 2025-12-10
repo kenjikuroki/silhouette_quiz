@@ -119,6 +119,22 @@ class PremiumPromotionDialog extends StatelessWidget {
            color: PuniButtonColors.blueGrey,
            onPressed: () => Navigator.of(context).pop(),
         ),
+        TextButton(
+          onPressed: () async {
+            await appState.purchaseService.restorePurchases();
+            // Restore handling is done via stream listener in PurchaseService.
+            // If successful, it updates the state.
+            // We might want to close the dialog or show a message, but the service handles it.
+            // For now, just call the method.
+            if (context.mounted) {
+               Navigator.of(context).pop();
+            }
+          },
+          child: const Text(
+            '購入を復元する',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+        ),
       ],
     );
   }

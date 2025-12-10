@@ -16,6 +16,8 @@ void main() async {
 
   final QuizAppState appState = QuizAppState();
   await appState.initialize();
+  // Initialize Purchase Service
+  await appState.purchaseService.initialize();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,

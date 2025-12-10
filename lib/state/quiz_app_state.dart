@@ -28,7 +28,6 @@ class QuizAppState extends ChangeNotifier {
   Future<void> initialize() async {
     _customQuizBox = await Hive.openBox<QuizSet>(customQuizBoxName);
     _metaBox = await Hive.openBox<List>('quiz_meta');
-    await purchaseService.loadPurchaseState();
     await silhouetteService.initialize();
     _loadDefaultQuizzes();
     notifyListeners();
