@@ -75,7 +75,9 @@ class CustomQuizListScreen extends StatelessWidget {
                               if (isNew) const _NewBadge(),
                             ],
                           ),
-                          subtitle: Text('${set.questions.length} もん'),
+                          subtitle: Text(
+                            l10n.customListQuizCount(set.questions.length),
+                          ),
                           trailing: IconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () {
@@ -150,15 +152,16 @@ class _NewBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: PuniButtonColors.pink,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Text(
-        'NEW',
-        style: TextStyle(
+      child: Text(
+        l10n.badgeNewLabel,
+        style: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
           fontSize: 12,

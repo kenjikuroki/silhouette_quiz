@@ -67,7 +67,7 @@ class CreateQuizIntroScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
-                            'しゃしんをとって じぶんだけの\nシルエットクイズを つくろう！\nさいだい５まい とれるよ',
+                            l10n.createIntroMessage,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 24,

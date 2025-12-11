@@ -165,11 +165,11 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
             ),
             SafeArea(
               child: Stack(
-                children: const [
+                children: [
                   Center(
-                    child: Text('クイズが みつかりません'),
+                    child: Text(l10n.playQuizNotFound),
                   ),
-                  CornerBackButton(),
+                  const CornerBackButton(),
                 ],
               ),
             ),
@@ -289,10 +289,11 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                   ),
                                   child: AspectRatio(
                                     aspectRatio: 1,
-                                    child: _buildQuestionVisual(
-                                      question,
-                                      showOriginalImage: showAnswer,
-                                    ),
+                                  child: _buildQuestionVisual(
+                                    context,
+                                    question,
+                                    showOriginalImage: showAnswer,
+                                  ),
                                   ),
                                 ),
                               );
@@ -422,7 +423,9 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: _buildFormattedAnswer(
-                                _questions[_currentIndex].answerText),
+                              context,
+                              _questions[_currentIndex].answerText,
+                            ),
                           )
                         : const SizedBox.shrink(),
                   ),
@@ -438,56 +441,62 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     );
   }
 
-  Widget _buildFormattedAnswer(String? text) {
+  Widget _buildFormattedAnswer(BuildContext context, String? text) {
     if (text == null || text.isEmpty) return const SizedBox.shrink();
 
     final List<String> parts = text.split('|');
-    if (parts.length == 1) {
-      return Text(
-        text,
-        style: const TextStyle(
-          fontSize: 48,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
-        ),
-      );
-    }
+    final String localeCode = Localizations.localeOf(context).languageCode;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // 1. Main Text (Large)
-        Text(
-          parts[0],
+    Text _large(String value) => Text(
+          value,
           style: const TextStyle(
             fontSize: 48,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
           textAlign: TextAlign.center,
-        ),
-        // 2. Sub Text (Small)
-        if (parts.length > 1)
-          Text(
-            parts[1],
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black54,
-            ),
-            textAlign: TextAlign.center,
+        );
+
+    Text _small(String value) => Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
           ),
-        // 3. English Text (Large)
-        if (parts.length > 2)
-          Text(
-            parts[2],
-            style: const TextStyle(
-              fontSize: 48,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          textAlign: TextAlign.center,
+        );
+
+    if (localeCode == 'en') {
+      final String english =
+          parts.length > 2 ? parts[2] : parts.last;
+      return _large(english);
+    }
+
+    if (localeCode == 'es') {
+      final String spanish = parts.length > 3
+          ? parts[3]
+          : (parts.length > 2 ? parts[2] : parts.first);
+      final String? english = parts.length > 2 ? parts[2] : null;
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _large(spanish),
+          if (english != null) _small(english),
+        ],
+      );
+    }
+
+    if (parts.length == 1) {
+      return _large(parts.first);
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _large(parts[0]),
+        if (parts.length > 1) _small(parts[1]),
+        if (parts.length > 2) _large(parts[2]),
       ],
     );
   }
@@ -496,9 +505,11 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
   /// - 答え表示前: シルエット画像を優先
   /// - 答え表示時: 元の写真を優先（なければシルエット）
   Widget _buildQuestionVisual(
+    BuildContext context,
     QuizQuestion question, {
     required bool showOriginalImage,
   }) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
     String? path;
     if (showOriginalImage && (question.originalImagePath?.isNotEmpty == true)) {
       path = question.originalImagePath;
@@ -523,8 +534,11 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                   color: silhouetteService.randomSilhouetteColor(),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Center(
-                  child: Text('Image Load Error', style: TextStyle(color: Colors.white)),
+                child: Center(
+                  child: Text(
+                    AppLocalizations.of(context).imageLoadError,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
               );
             },
@@ -569,7 +583,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
       ),
       child: Center(
         child: Text(
-          'シルエット ${_currentIndex + 1}',
+          l10n.playQuizPlaceholderTitle(_currentIndex + 1),
           style: const TextStyle(
             color: Colors.white,
             fontSize: 24,
@@ -636,7 +650,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
           showCongratulationHeader: true,
           backgroundAsset: 'assets/images/character/result.png',
           borderColor: const Color(0xFFE49A00),
-          celebrationTitle: 'がんばったね！',
+          celebrationTitle: l10n.playQuizCelebrationTitle,
           celebrationFontSize: 20,
           useCelebrationOutline: true,
           icon: Row(

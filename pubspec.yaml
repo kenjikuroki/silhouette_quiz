@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # ローカライズ（GlobalMaterialLocalizations など）
+  # ローカライズ（GlobalMaterialLocalizations などscripts/run_test.shscripts/run_test.sh）
   flutter_localizations:
     sdk: flutter
 
@@ -34,6 +34,7 @@ dependencies:
   google_mlkit_subject_segmentation: ^0.0.2
   audioplayers: ^5.2.1
   in_app_purchase: ^3.0.0
+  flutter_native_splash: ^2.3.10
 
 dev_dependencies:
   hive_generator: ^2.0.0
@@ -56,8 +57,14 @@ flutter:
     - assets/images/quiz/school_supplies/
     - assets/images/quiz/vehicle/
     - assets/images/character/
+    - assets/images/icon/cat_icon.png
+    - assets/images/icon/cat_icon_r.png
+    - assets/images/icon/factory1.png
+    - assets/images/icon/factory2.png
 
     - assets/images/button/
+    - assets/images/button/button_en/
+    - assets/images/button/button_se/
     - assets/images/conveyor.png
     - assets/images/conveyor_y.png
     - assets/images/box.png

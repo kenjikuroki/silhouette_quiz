@@ -97,17 +97,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       builder: (context, _) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Silhouette Quiz',
+          onGenerateTitle: (context) => AppLocalizations.of(context).homeTitle,
           theme: ThemeData(
             primarySwatch: Colors.blue,
             textTheme: mediumTextTheme,
             // Ensure implicit text widgets also get the font family if possible
             fontFamily: GoogleFonts.mPlusRounded1c().fontFamily, 
           ),
-          locale: const Locale('ja'),
-          supportedLocales: const [
-            Locale('ja'),
-          ],
+          supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: const [
             AppLocalizationsDelegate(),
             GlobalMaterialLocalizations.delegate,

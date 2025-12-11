@@ -95,7 +95,7 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                           child: Row(
                             children: [
                               Text(
-                                '${index + 1}まいめ',
+                                l10n.createCaptureItemLabel(index + 1),
                                 style: TextStyle(
                                   fontSize: 20 * scale,
                                   fontWeight: FontWeight.bold,
@@ -155,8 +155,8 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                 right: horizontalOffset + 240 * scale,
                 bottom: verticalOffset + 430 * scale,
                 width: 180 * scale,
-                child: PuniButton(
-                  text: 'しゃしんをとる',
+              child: PuniButton(
+                  text: l10n.createCaptureTitle,
                   color: PuniButtonColors.green,
                   onPressed: _tempQuestions.length >= maxImages
                       ? null
@@ -246,8 +246,9 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
     } catch (e) {
       debugPrint('Error creating silhouette: $e');
       if (mounted) {
+        final AppLocalizations l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('エラーが発生しました: $e')),
+          SnackBar(content: Text(l10n.createCaptureErrorMessage('$e'))),
         );
       }
       return;
@@ -328,6 +329,7 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
     showDialog<void>(
       context: context,
       builder: (context) {
+        final AppLocalizations dialogL10n = AppLocalizations.of(context);
         return AlertDialog(
           contentPadding: EdgeInsets.zero,
           content: hasFile
@@ -338,10 +340,12 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                     fit: BoxFit.contain,
                   ),
                 )
-              : const SizedBox(
+              : SizedBox(
                   width: 200,
                   height: 200,
-                  child: Center(child: Text('シルエットがありません')),
+                  child: Center(
+                    child: Text(dialogL10n.createCaptureNoSilhouette),
+                  ),
                 ),
         );
       },

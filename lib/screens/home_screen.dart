@@ -90,14 +90,18 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final String languageCode = Localizations.localeOf(context).languageCode;
+    
     precacheImage(
-        const AssetImage('assets/images/button/challenge_bo.png'), context);
+        AssetImage(_getChallengeButtonPath(false, languageCode)), context);
     precacheImage(
-        const AssetImage('assets/images/button/challenge_bo_P.png'), context);
+        AssetImage(_getChallengeButtonPath(true, languageCode)), context);
     precacheImage(
-        const AssetImage('assets/images/button/myself_right_bo.png'), context);
+        AssetImage(_getCreateButtonPath(false, languageCode)), context);
     precacheImage(
-        const AssetImage('assets/images/button/myself_left_bo.png'), context);
+        AssetImage(_getCreateButtonPath(true, languageCode)), context);
+    precacheImage(
+        AssetImage(_getBackgroundImagePath(languageCode)), context);
     precacheImage(const AssetImage('assets/images/character/３.png'), context);
     precacheImage(const AssetImage('assets/images/character/４.png'), context);
     precacheImage(const AssetImage('assets/images/character/５.png'), context);
@@ -269,11 +273,27 @@ class _HomeScreenState extends State<HomeScreen>
           final double horizontalOffset = (w - designWidth * scale) / 2;
           final double verticalOffset = (h - designHeight * scale) / 2;
 
-          // モバイル判定はやめて、常に同じロジックで bottom を出す
+          double buttonScale = 1.0;
+          double challengeOffsetX = 0;
+          double challengeOffsetY = 0;
+          double createOffsetX = 0;
+          double createOffsetY = 0;
+
+          if (l10n.locale.languageCode == 'es' ||
+              l10n.locale.languageCode == 'en') {
+            buttonScale = 0.6;
+            // Scaleダウン(1.0 -> 0.6)による位置ズレ(左下基準)を補正して「右上」へ寄せる
+            // 幅の20%分(中心合わせ) + 微調整
+            challengeOffsetX = challengeWidth * 0.2;
+            challengeOffsetY = challengeWidth * 0.08;
+            createOffsetX = createWidth * 0.2;
+            createOffsetY = createWidth * 0.08;
+          }
+
           final double challengeBottomPos =
-              verticalOffset + (challengeBottom - 60) * scale;
+              verticalOffset + (challengeBottom - 60 + challengeOffsetY) * scale;
           final double createBottomPos =
-              verticalOffset + (createBottom - 60) * scale;
+              verticalOffset + (createBottom - 60 + createOffsetY) * scale;
 
           return Stack(
             children: [
@@ -285,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen>
                 child: GestureDetector(
                   onTap: _dropCharacter,
                   child: Image.asset(
-                    'assets/images/backgrounds/background.png',
+                    _getBackgroundImagePath(l10n.locale.languageCode),
                     // ここはもう自前で width/height を指定しているので fill でOK
                     fit: BoxFit.fill,
                   ),
@@ -347,26 +367,24 @@ class _HomeScreenState extends State<HomeScreen>
               ),
 
               Positioned(
-                left: horizontalOffset + challengeLeft * scale,
+                left: horizontalOffset + (challengeLeft + challengeOffsetX) * scale,
                 bottom: challengeBottomPos,
                 child: _buildActionObject(
-                  width: challengeWidth * scale * 1.1,
-                  imagePath: _isChallengePressed
-                      ? 'assets/images/button/challenge_bo_P.png'
-                      : 'assets/images/button/challenge_bo.png',
+                  width: challengeWidth * scale * buttonScale,
+                  imagePath: _getChallengeButtonPath(
+                      _isChallengePressed, l10n.locale.languageCode),
                   semanticsLabel: l10n.homeModeChallenge,
                   onPressed: () => _onChallengePressed(),
                 ),
               ),
 
               Positioned(
-                left: horizontalOffset + createLeft * scale,
+                left: horizontalOffset + (createLeft + createOffsetX) * scale,
                 bottom: createBottomPos,
                 child: _buildActionObject(
-                  width: createWidth * scale * 1.1,
-                  imagePath: _isCreatePressed
-                      ? 'assets/images/button/myself_left_bo.png'
-                      : 'assets/images/button/myself_right_bo.png',
+                  width: createWidth * scale * buttonScale,
+                  imagePath: _getCreateButtonPath(
+                      _isCreatePressed, l10n.locale.languageCode),
                   semanticsLabel: l10n.homeModeCreate,
                   onPressed: () => _onCreatePressed(),
                 ),
@@ -466,5 +484,50 @@ class _HomeScreenState extends State<HomeScreen>
         ],
       ),
     );
+  }
+
+  String _getChallengeButtonPath(bool isPressed, String languageCode) {
+    if (languageCode == 'en') {
+      return isPressed
+          ? 'assets/images/button/button_en/challenge_bo_P_bo_en.png'
+          : 'assets/images/button/button_en/challenge_bo_en.png';
+    } else if (languageCode == 'es') {
+      return isPressed
+          ? 'assets/images/button/button_se/challenge_bo_P_se.png'
+          : 'assets/images/button/button_se/challenge_bo_se.png';
+    } else {
+      return isPressed
+          ? 'assets/images/button/challenge_bo_P.png'
+          : 'assets/images/button/challenge_bo.png';
+    }
+  }
+
+  String _getCreateButtonPath(bool isPressed, String languageCode) {
+    if (languageCode == 'en') {
+      // For English, Left is pressed, Right is normal
+      return isPressed
+          ? 'assets/images/button/button_en/myself_left_bo_en.png'
+          : 'assets/images/button/button_en/myself_right_bo_en.png';
+    } else if (languageCode == 'es') {
+      // For Spanish, Left is pressed, Right is normal
+      return isPressed
+          ? 'assets/images/button/button_se/myself_left_bo_se.png'
+          : 'assets/images/button/button_se/myself_right_bo_se.png';
+    } else {
+      // Default
+      return isPressed
+          ? 'assets/images/button/myself_left_bo.png'
+          : 'assets/images/button/myself_right_bo.png';
+    }
+  }
+
+  String _getBackgroundImagePath(String languageCode) {
+    if (languageCode == 'en') {
+      return 'assets/images/backgrounds/background_en.png';
+    } else if (languageCode == 'es') {
+      return 'assets/images/backgrounds/background_se.png';
+    } else {
+      return 'assets/images/backgrounds/background.png';
+    }
   }
 }

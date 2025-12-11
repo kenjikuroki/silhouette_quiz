@@ -113,7 +113,7 @@ class ChallengeScreen extends StatelessWidget {
                                               }
                                             },
                                             child: ListTile(
-                                              title: Text(set.title),
+                                              title: Text(_quizSetTitle(l10n, set)),
                                               trailing: isLocked ? const Icon(Icons.lock, color: Colors.grey) : null,
                                             ),
                                           );
@@ -188,7 +188,11 @@ class ChallengeScreen extends StatelessWidget {
                                             child: ListTile(
                                               title: Row(
                                                 children: [
-                                                  Expanded(child: Text(set.title)),
+                                                  Expanded(
+                                                    child: Text(
+                                                      _quizSetTitle(l10n, set),
+                                                    ),
+                                                  ),
                                                   if (isNew)
                                                     const _NewBadge(),
                                                 ],
@@ -252,6 +256,28 @@ class ChallengeScreen extends StatelessWidget {
       ),
     );
   }
+
+  String _quizSetTitle(AppLocalizations l10n, QuizSet set) {
+    if (set.isCustom) {
+      return set.title;
+    }
+    switch (set.id) {
+      case 'animal_1':
+        return l10n.quizSetAnimals;
+      case 'food_1':
+        return l10n.quizSetFood;
+      case 'vehicle_1':
+        return l10n.quizSetVehicle;
+      case 'home_1':
+        return l10n.quizSetHomeItems;
+      case 'kitchen_1':
+        return l10n.quizSetKitchenItems;
+      case 'school_supplies_1':
+        return l10n.quizSetStationery;
+      default:
+        return set.title;
+    }
+  }
 }
 
 class _NewBadge extends StatelessWidget {
@@ -259,15 +285,16 @@ class _NewBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: PuniButtonColors.pink,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Text(
-        'NEW',
-        style: TextStyle(
+      child: Text(
+        l10n.badgeNewLabel,
+        style: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
           fontSize: 12,

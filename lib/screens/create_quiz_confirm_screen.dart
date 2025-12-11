@@ -450,7 +450,7 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                                         backgroundAsset:
                                                             'assets/images/character/completion.png',
                                                         celebrationTitle:
-                                                            'かんせい！',
+                                                            l10n.createConfirmCelebrationTitle,
                                                         hideCelebrationMessage:
                                                             true,
                                                         useCelebrationOutline: true,

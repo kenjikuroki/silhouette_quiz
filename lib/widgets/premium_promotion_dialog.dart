@@ -130,9 +130,9 @@ class PremiumPromotionDialog extends StatelessWidget {
                Navigator.of(context).pop();
             }
           },
-          child: const Text(
-            '購入を復元する',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+          child: Text(
+            l10n.premiumRestoreButton,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ),
       ],
