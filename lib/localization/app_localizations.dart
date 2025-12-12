@@ -101,14 +101,14 @@ class AppLocalizations {
       // Paywall
       'paywall_title': 'もっと つくるには？',
       'paywall_message':
-          'じぶんで つくった クイズは 3つ まで むりょうで つくれます。\nそれ いじょう つくるには、\nいちどだけ 100円で ぜんぶ つかえるように なります。',
-      'paywall_buy_button': '100円で かう',
+          'じぶんで つくった クイズは 3つ まで むりょうで つくれます。\nそれ いじょう つくるには、\nいちどだけ 300円で ぜんぶ つかえるように なります。',
+      'paywall_buy_button': '300円で かう',
       'paywall_later_button': 'あとで',
 
       // Premium Promotion
       'premium_promotion_title': 'プレミアム版のお知らせ',
       'premium_promotion_message': '・ロック中の3つのカテゴリであそべるようになります。\n・自分で作れるクイズリストを3つ以上作成できます。\n・一度の購入で、ずっと使えます。',
-      'premium_promotion_buy_button': '100円でプレミアム版を購入',
+      'premium_promotion_buy_button': '300円でプレミアム版を購入',
       'premium_restore_button': '購入を復元する',
       'purchase_complete_title': 'ありがとう！',
       'purchase_complete_message': 'プレミアム版になったよ！\nたくさんクイズをつくってね！',
@@ -206,8 +206,8 @@ class AppLocalizations {
       // Paywall
       'paywall_title': 'Want to make more?',
       'paywall_message':
-          'You can create up to 3 custom quizzes for free.\nPay 100 yen once to unlock everything forever.',
-      'paywall_buy_button': 'Buy for ¥100',
+          'You can create up to 3 custom quizzes for free.\nPay 300 yen once to unlock everything forever.',
+      'paywall_buy_button': 'Buy for ¥300',
       'paywall_later_button': 'Later',
 
       // Premium Promotion
@@ -313,8 +313,8 @@ class AppLocalizations {
       // Paywall
       'paywall_title': '¿Quieres crear más?',
       'paywall_message':
-          'Puedes crear hasta 3 quizzes gratis.\nPaga 100 yenes una vez para usar todo para siempre.',
-      'paywall_buy_button': 'Comprar por ¥100',
+          'Puedes crear hasta 3 quizzes gratis.\nPaga 300 yenes una vez para usar todo para siempre.',
+      'paywall_buy_button': 'Comprar por ¥300',
       'paywall_later_button': 'Después',
 
       // Premium Promotion
