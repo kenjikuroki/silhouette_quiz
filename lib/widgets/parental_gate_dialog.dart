@@ -38,33 +38,31 @@ class _ParentalGateDialogState extends State<ParentalGateDialog> {
     final random = Random();
     _a = random.nextInt(8) + 2; // 2-9
     _b = random.nextInt(8) + 2; // 2-9
-  }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_orientationLocked) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final size = MediaQuery.of(context).size;
       _isTablet = size.shortestSide >= 600;
       if (!_isTablet) {
         // Force Portrait for phones
-        SystemChrome.setPreferredOrientations([
+        await SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
         ]);
       }
-      _orientationLocked = true;
-    }
+    });
   }
 
   @override
   void dispose() {
     // Revert to Landscape if we changed it (Phones)
-    if (!_isTablet) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-    }
+    // We can't rely on _isTablet being perfectly stable if context died, 
+    // but usually it is fine. To be safe, always restore landscape on dispose
+    // if we are on a device that *might* have rotated.
+    // Or just always restore for this app's requirement.
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     super.dispose();
   }
 
@@ -153,7 +151,7 @@ class _ParentalGateDialogState extends State<ParentalGateDialog> {
         Text(
           l10n.parentalGateTitle,
           style: TextStyle(
-            fontSize: 18 * scale,
+            fontSize: 18 * scale, // Reduced from 22
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -161,7 +159,7 @@ class _ParentalGateDialogState extends State<ParentalGateDialog> {
         Text(
           l10n.parentalGateMessage,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14 * scale),
+          style: TextStyle(fontSize: 16 * scale), // Reduced from 22
         ),
         SizedBox(height: 16 * scale),
         // Problem and Input
@@ -176,7 +174,7 @@ class _ParentalGateDialogState extends State<ParentalGateDialog> {
               Text(
                 '$_a × $_b = ?',
                 style: TextStyle(
-                  fontSize: 24 * scale,
+                  fontSize: 22 * scale, // Reduced from 24
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -193,7 +191,7 @@ class _ParentalGateDialogState extends State<ParentalGateDialog> {
                   _input.isEmpty ? '' : _input,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 20 * scale,
+                    fontSize: 20 * scale, // Reduced from 22
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -208,7 +206,7 @@ class _ParentalGateDialogState extends State<ParentalGateDialog> {
               l10n.parentalGateFailed,
               style: TextStyle(
                 color: Colors.red,
-                fontSize: 14 * scale,
+                fontSize: 18 * scale, // Reduced from 22
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -219,23 +217,41 @@ class _ParentalGateDialogState extends State<ParentalGateDialog> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 120 * scale,
-              child: PuniButton(
-                text: l10n.commonCancel,
-                color: PuniButtonColors.blueGrey,
-                onPressed: () => Navigator.of(context).pop(false),
-                height: 40 * scale,
+            Expanded(
+              child: SizedBox(
+                width: double.infinity,
+                child: PuniButton(
+                  child: Text(
+                    l10n.commonCancel,
+                    style: TextStyle(
+                      fontSize: 16 * scale,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  color: PuniButtonColors.blueGrey,
+                  onPressed: () => Navigator.of(context).pop(false),
+                  height: 40 * scale,
+                ),
               ),
             ),
             SizedBox(width: 16 * scale),
-            SizedBox(
-              width: 120 * scale,
-              child: PuniButton(
-                text: l10n.commonOk,
-                color: PuniButtonColors.pink,
-                onPressed: _validate,
-                height: 40 * scale,
+            Expanded(
+              child: SizedBox(
+                width: double.infinity,
+                child: PuniButton(
+                  child: Text(
+                    l10n.commonOk,
+                    style: TextStyle(
+                      fontSize: 16 * scale,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  color: PuniButtonColors.pink,
+                  onPressed: _validate,
+                  height: 40 * scale,
+                ),
               ),
             ),
           ],
@@ -298,7 +314,7 @@ class _ParentalGateDialogState extends State<ParentalGateDialog> {
                   key,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 20 * scale,
+                    fontSize: 18 * scale, // Reduced from 22
                     fontWeight: FontWeight.bold,
                   ),
                 ),

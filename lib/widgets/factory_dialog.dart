@@ -54,9 +54,14 @@ class FactoryDialog extends StatelessWidget {
     // iPad Pro 12.9 is 1366px.
     // Scale will be applied to fonts and padding.
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double scale = (screenWidth / 600).clamp(1.0, 2.4);
+    // Use shortestSide to correctly identify tablets vs large phones
+    final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    final double scale = isTablet
+        ? (screenWidth / 850).clamp(1.0, 1.4) // Tablet scale (Increased)
+        : (screenWidth / 380).clamp(0.8, 1.3); // Phone scale
+    final double fontScale = isTablet ? 1.5 : 1.0;
 
-    Widget child = _buildContent(context, scale);
+    Widget child = _buildContent(context, scale, fontScale);
     if (useSparkle) {
       child = SparkleBackground(
         sparkleCount: 30,
@@ -105,11 +110,11 @@ class FactoryDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, double scale) {
+  Widget _buildContent(BuildContext context, double scale, double fontScale) {
     // Pass scale to layouts
     final Widget inner = showCongratulationHeader
-        ? _buildCelebrationLayout(scale)
-        : _buildStandardLayout(context, scale);
+        ? _buildCelebrationLayout(scale, fontScale)
+        : _buildStandardLayout(context, scale, fontScale);
     
     return Container(
       decoration: BoxDecoration(
@@ -136,13 +141,17 @@ class FactoryDialog extends StatelessWidget {
                 ? DecorationImage(
                     image: AssetImage(backgroundAsset!),
                     fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white.withOpacity(0.3),
+                      BlendMode.lighten,
+                    ),
                   )
                 : null,
           ),
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 24 * scale,
-              vertical: 20 * scale,
+              vertical: 10 * scale,
             ),
             child: inner,
           ),
@@ -151,7 +160,7 @@ class FactoryDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildCelebrationLayout(double scale) {
+  Widget _buildCelebrationLayout(double scale, double fontScale) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double imageHeight = constraints.maxHeight * 0.92;
@@ -165,6 +174,7 @@ class FactoryDialog extends StatelessWidget {
           actions: actions,
           enabledNotifier: enabledNotifier,
           scale: scale,
+          fontScale: fontScale,
           celebrationFontSize: celebrationFontSize,
           useCelebrationOutline: useCelebrationOutline,
           celebrationTextColor: celebrationTextColor,
@@ -174,7 +184,7 @@ class FactoryDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildStandardLayout(BuildContext context, double scale) {
+  Widget _buildStandardLayout(BuildContext context, double scale, double fontScale) {
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min, // Hug content vertically
@@ -194,7 +204,7 @@ class FactoryDialog extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: (titleFontSize ?? 22) * scale,
+                fontSize: (titleFontSize ?? 22) * scale * fontScale,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -206,8 +216,9 @@ class FactoryDialog extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: (messageFontSize ?? 16) * scale,
-                color: Colors.black,
+                fontSize: (messageFontSize ?? 18) * scale * fontScale,
+                color: Colors.black87,
+                height: 1.4,
               ),
             ),
             SizedBox(height: 20 * scale),
@@ -243,6 +254,7 @@ class _CelebrationContent extends StatelessWidget {
   final List<Widget> actions;
   final ValueNotifier<bool> enabledNotifier;
   final double scale;
+  final double fontScale;
   final double? celebrationFontSize;
   final bool useCelebrationOutline;
   final Color? celebrationTextColor;
@@ -257,6 +269,7 @@ class _CelebrationContent extends StatelessWidget {
     required this.actions,
     required this.enabledNotifier,
     required this.scale,
+    this.fontScale = 1.0,
     this.celebrationFontSize,
     required this.useCelebrationOutline,
     this.celebrationTextColor,
@@ -265,86 +278,81 @@ class _CelebrationContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    // Always use Column for equal spacing
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
+        _buildTitleText(),
         if (headerImage != null)
-          Align(
-            alignment: Alignment.center,
-            child: _AnimatedCharacterImage(
+           _AnimatedCharacterImage(
               child: SizedBox(
-                height: imageHeight,
+                height: imageHeight * 0.55, // Adjusted to prevent overflow (0.65 -> 0.55)
                 child: headerImage,
               ),
             ),
-          ),
-        Align(
-            alignment: const Alignment(0, -0.9),
-          child: useCelebrationOutline
-              ? _buildOutlineText(
-                  celebrationTitle,
-                  fontSize: (celebrationFontSize ?? 24) * scale,
-                  strokeWidth: 5 * scale,
-                  textColor: celebrationTextColor ?? Colors.black,
-                  strokeColor: celebrationOutlineColor ?? Colors.white,
-                )
-              : Text(
-                  celebrationTitle,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: (celebrationFontSize ?? 24) * scale,
-                    fontWeight: FontWeight.bold,
-                    color: celebrationTextColor ?? Colors.black,
+        if (icon != null) Transform.scale(scale: scale, child: icon!),
+        if (message.isNotEmpty) _buildMessageText(),
+        _buildActions(context),
+      ],
+    );
+  }
+
+  Widget _buildTitleText() {
+    final fontSize = (celebrationFontSize ?? 24) * scale * fontScale;
+    return useCelebrationOutline
+        ? _buildOutlineText(
+            celebrationTitle,
+            fontSize: fontSize,
+            strokeWidth: 8 * scale,
+            textColor: celebrationTextColor ?? Colors.white,
+            strokeColor: celebrationOutlineColor ?? Colors.black,
+          )
+        : Text(
+            celebrationTitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: celebrationTextColor ?? Colors.black,
+            ),
+          );
+  }
+
+  Widget _buildMessageText() {
+    return _buildOutlineText(
+      message,
+      fontSize: (celebrationFontSize ?? 24) * scale * fontScale, // Match title size
+      strokeWidth: 8 * scale, // Match title stroke
+    );
+  }
+
+  Widget _buildActions(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: enabledNotifier,
+      builder: (BuildContext context, bool enabled, Widget? child) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: actions
+              .map(
+                (Widget action) => Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4 * scale),
+                  child: AbsorbPointer(
+                    absorbing: !enabled,
+                    child: Opacity(
+                      opacity: enabled ? 1.0 : 0.4,
+                      child: MediaQuery(
+                        data: MediaQuery.of(context).copyWith(
+                          textScaler: TextScaler.linear(scale),
+                        ),
+                        child: action,
+                      ),
+                    ),
                   ),
                 ),
-        ),
-
-        if (icon != null)
-          Align(
-            alignment: const Alignment(0, -0.1),
-            child: Transform.scale(scale: scale, child: icon!),
-          ),
-        if (message.isNotEmpty)
-          Align(
-            alignment: (headerImage == null && icon == null)
-                ? const Alignment(0, -0.4)
-                : const Alignment(0, 0.35),
-            child: _buildOutlineText(
-              message,
-              fontSize: 16 * scale,
-              strokeWidth: 3 * scale,
-            ),
-          ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: ValueListenableBuilder<bool>(
-            valueListenable: enabledNotifier,
-            builder: (BuildContext context, bool enabled, Widget? child) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: actions
-                    .map(
-                      (Widget action) => Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4 * scale),
-                        child: AbsorbPointer(
-                          absorbing: !enabled,
-                          child: Opacity(
-                            opacity: enabled ? 1.0 : 0.4,
-                            child: MediaQuery(
-                              data: MediaQuery.of(context).copyWith(
-                                textScaler: TextScaler.linear(scale),
-                              ),
-                              child: action,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-              );
-            },
-          ),
-        ),
-      ],
+              )
+              .toList(),
+        );
+      },
     );
   }
 }

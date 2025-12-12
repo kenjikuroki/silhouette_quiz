@@ -53,6 +53,8 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
           final double scale = max(w / designWidth, h / designHeight);
           final double horizontalOffset = (w - designWidth * scale) / 2;
           final double verticalOffset = (h - designHeight * scale) / 2;
+          final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+          final double fontScale = isTablet ? 1.5 : 1.0;
 
           return Stack(
             children: [
@@ -97,14 +99,14 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                               Text(
                                 l10n.createCaptureItemLabel(index + 1),
                                 style: TextStyle(
-                                  fontSize: 20 * scale,
+                                  fontSize: 22 * scale * fontScale,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const Spacer(),
                               IconButton(
                                 icon: const Icon(Icons.close),
-                                iconSize: 24 * scale,
+                                iconSize: 24 * scale * fontScale,
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
                                 style: IconButton.styleFrom(
@@ -128,7 +130,7 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                 Positioned(
                   right: horizontalOffset + 240 * scale,
                   bottom: verticalOffset + 540 * scale,
-                  width: 200 * scale,
+                  width: MediaQuery.of(context).size.shortestSide >= 600 ? 240 * scale : 200 * scale,
                   child: Center(
                     child: DecoratedBox(
                       decoration: const BoxDecoration(
@@ -140,9 +142,9 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                             vertical: 8, horizontal: 12),
                         child: Text(
                           l10n.createCaptureLimitMessage,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: Colors.red,
-                              fontSize: 14,
+                              fontSize: 22 * fontScale,
                               fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
@@ -154,20 +156,25 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
               Positioned(
                 right: horizontalOffset + 240 * scale,
                 bottom: verticalOffset + 430 * scale,
-                width: 180 * scale,
+                width: isTablet ? 180 * scale * 1.2 : 240 * scale,
               child: PuniButton(
                   text: l10n.createCaptureTitle,
                   color: PuniButtonColors.green,
                   onPressed: _tempQuestions.length >= maxImages
                       ? null
                       : _captureImageFromCamera,
+                  height: 56 * (isTablet ? 1.2 : 1.0),
+                  child: Text(
+                    l10n.createCaptureTitle,
+                    style: TextStyle(fontSize: isTablet ? 30 : 18, color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
               // Finish Button
               Positioned(
                 right: horizontalOffset + 240 * scale,
                 bottom: verticalOffset + 340 * scale,
-                width: 180 * scale,
+                width: isTablet ? 180 * scale * 1.2 : 240 * scale,
                 child: PuniButton(
                   text: l10n.createCaptureFinish,
                   color: PuniButtonColors.pink,
@@ -183,6 +190,11 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                             ),
                           );
                         },
+                  height: 56 * (isTablet ? 1.2 : 1.0),
+                  child: Text(
+                    l10n.createCaptureFinish,
+                    style: TextStyle(fontSize: isTablet ? 30 : 18, color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ],
@@ -269,6 +281,8 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
 
   void _confirmRemoveQuestion(BuildContext context, int index) async {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    final double fontScale = isTablet ? 1.5 : 1.0;
 
     final bool? result = await FactoryDialog.showFadeDialog<bool>(
       context: context,
@@ -280,26 +294,28 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
           useSparkle: false,
           forceAspectRatio: false,
           borderColor: Colors.lightGreen,
-          messageFontSize: 13,
+          messageFontSize: 13 * fontScale,
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 120,
+                  width: 120 * fontScale,
                   child: PuniButton(
                     text: l10n.commonCancel,
                     color: PuniButtonColors.blueGrey,
                     onPressed: () => Navigator.of(dialogContext).pop(false),
+                    child: Text(l10n.commonCancel, style: TextStyle(fontSize: 16 * fontScale, color: Colors.white)),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16 * fontScale),
                 SizedBox(
-                  width: 120,
+                  width: 120 * fontScale,
                   child: PuniButton(
                     text: l10n.captureDeleteOk,
                     color: PuniButtonColors.pink,
                     onPressed: () => Navigator.of(dialogContext).pop(true),
+                     child: Text(l10n.captureDeleteOk, style: TextStyle(fontSize: 16 * fontScale, color: Colors.white)),
                   ),
                 ),
               ],

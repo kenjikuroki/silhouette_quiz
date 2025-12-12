@@ -276,8 +276,11 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
           SafeArea(
             child: Stack(
               children: [
-                LayoutBuilder(
+                  LayoutBuilder(
                   builder: (context, constraints) {
+                    final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    final double fontScale = isTablet ? 1.5 : 1.0;
+
                     return SingleChildScrollView(
                       child: ConstrainedBox(
                         constraints:
@@ -292,8 +295,8 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                 children: [
                                   // const SizedBox(height: 16), // Removed to move higher
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 8),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16 * fontScale, vertical: 8 * fontScale),
                                     decoration: BoxDecoration(
                                       color: Colors.white.withOpacity(0.8),
                                       borderRadius: BorderRadius.circular(16),
@@ -301,8 +304,8 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                     child: Text(
                                       l10n.createConfirmMessage,
                                       textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontSize: 20,
+                                      style: TextStyle(
+                                        fontSize: 22 * fontScale,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -315,12 +318,17 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                 children: [
                                   // Narrow Input Field (Widened per request)
                                   SizedBox(
-                                    width: 320, // Increased from 240
+                                    width: 320 * fontScale, // Scale width too? Maybe safer to just scale font. Let's scale width a bit for iPad.
                                     child: TextField(
                                       controller: _titleController,
                                       maxLength: 20,
+                                      style: TextStyle(
+                                          fontSize: 24 * fontScale,
+                                          fontWeight: FontWeight.bold),
                                       decoration: InputDecoration(
                                         labelText: l10n.createConfirmTitleLabel,
+                                        labelStyle:
+                                            TextStyle(fontSize: 20 * fontScale),
                                         counterText: '',
                                         filled: true,
                                         fillColor:
@@ -329,18 +337,18 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                           borderRadius: BorderRadius.circular(16),
                                           borderSide: BorderSide.none,
                                         ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 0),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 16 * fontScale,
+                                            vertical: 16 * fontScale),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 16),
+                                  SizedBox(height: 16 * fontScale),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       SizedBox(
-                                        width: 160,
+                                        width: 160 * fontScale, // Button width scaling
                                         child: PuniButton(
                                           onPressed: _buttonsEnabled && !_buttonsLocked
                                               ? () {
@@ -355,17 +363,17 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                           textColor: Colors.white,
                                           child: Text(
                                             l10n.createConfirmBackButton,
-                                            style: const TextStyle(
-                                              fontSize: 14,
+                                            style: TextStyle(
+                                              fontSize: 22 * fontScale,
                                               color: Colors.white,
                                             ),
                                           ),
-                                          height: 48,
+                                          height: 48 * fontScale,
                                         ),
                                       ),
-                                      const SizedBox(width: 24),
+                                      SizedBox(width: 24 * fontScale),
                                       SizedBox(
-                                        width: 160,
+                                        width: 160 * fontScale,
                                         child: PuniButton(
                                           color: PuniButtonColors.pink,
                                           textColor: Colors.white,
@@ -463,6 +471,9 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                                             child: PuniButton(
                                                               text: l10n.commonOk,
                                                               color: PuniButtonColors.pink,
+                                                              padding: const EdgeInsets.symmetric(
+                                                                  horizontal: 14,
+                                                                  vertical: 10),
                                                               onPressed: () {
                                                                 Navigator.of(dialogContext).pop();
                                                               },
@@ -502,7 +513,7 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                                     }
                                                   }
                                                     },
-                                              height: 48,
+                                              height: 48 * fontScale,
                                               child: _isSaving
                                                   ? const SizedBox(
                                                       width: 24,
@@ -515,8 +526,8 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                                     )
                                                   : Text(
                                                       l10n.createConfirmSaveButton,
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
+                                                      style: TextStyle(
+                                                        fontSize: 22 * fontScale,
                                                         color: Colors.white,
                                                       ),
                                                     ),
@@ -524,7 +535,7 @@ class _CreateQuizConfirmScreenState extends State<CreateQuizConfirmScreen>
                                           ),
                                     ],
                                   ),
-                                  const SizedBox(height: 0), // Moved lower (was 10)
+                                  SizedBox(height: 0), // Moved lower (was 10)
                                 ],
                               ),
                             ],

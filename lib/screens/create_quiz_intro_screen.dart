@@ -28,6 +28,9 @@ class CreateQuizIntroScreen extends StatelessWidget {
         builder: (context, constraints) {
           final double w = constraints.maxWidth;
           final double h = constraints.maxHeight;
+          final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+          final double fontScale = isTablet ? 1.5 : 1.0;
+          final double buttonWidth = isTablet ? 300 : 200;
           const double designWidth = 1024;
           const double designHeight = 768;
           final double scale = max(w / designWidth, h / designHeight);
@@ -49,59 +52,69 @@ class CreateQuizIntroScreen extends StatelessWidget {
               SafeArea(
             child: Stack(
               children: [
-                CenteredLayout(
-                  backgroundColor: Colors.transparent,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 18,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            l10n.createIntroMessage,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                  CenteredLayout(
+                    backgroundColor: Colors.transparent,
+                    maxContentWidth: isTablet ? 760.0 : 480.0, // Wider on iPad
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 32 * scale,
+                              vertical: 18 * scale,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(16 * scale),
+                            ),
+                            child: Text(
+                              l10n.createIntroMessage,
+                              textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: isTablet ? 36 : 18,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.5,
+                                ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 24),
-                        const SizedBox(height: 24),
-                        Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 140),
-                            child: PuniButton(
-                              text: l10n.createIntroStartButton,
-                              color: PuniButtonColors.green,
-                              textColor: Colors.white,
-                              onPressed: () async {
-                                final bool canCreate =
-                                    await appState.ensureCanCreateCustomQuizSet();
-                                if (!canCreate) {
-                                  return;
-                                }
-                                Navigator.of(context).pushNamed(
-                                  CreateQuizCaptureScreen.routeName,
-                                );
-                              },
+                          const SizedBox(height: 24),
+                          const SizedBox(height: 24),
+                          Center(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: isTablet ? 220 : 160),
+                              child: PuniButton(
+                                text: l10n.createIntroStartButton,
+                                color: PuniButtonColors.green,
+                                textColor: Colors.white,
+                                onPressed: () async {
+                                  final bool canCreate =
+                                      await appState.ensureCanCreateCustomQuizSet();
+                                  if (!canCreate) {
+                                    return;
+                                  }
+                                  Navigator.of(context).pushNamed(
+                                    CreateQuizCaptureScreen.routeName,
+                                  );
+                                },
+                                child: Text(
+                                  l10n.createIntroStartButton,
+                                    style: TextStyle(
+                                      fontSize: isTablet ? 30 : 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const CornerBackButton(),
+                  const CornerBackButton(),
               ],
             ),
           ),

@@ -33,6 +33,11 @@ class ChallengeScreen extends StatelessWidget {
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
+          final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    
+    // Scale for iPad
+    final double titleSize = isTablet ? 32 : 22;
+    final double itemSize = isTablet ? 24 : 16;
           final double w = constraints.maxWidth;
           final double h = constraints.maxHeight;
           const double designWidth = 1024;
@@ -65,7 +70,7 @@ class ChallengeScreen extends StatelessWidget {
               SafeArea(
             child: Stack(
               children: [
-                CenteredLayout(
+                  CenteredLayout(
                   maxContentWidth: 900,
                   backgroundColor: Colors.transparent,
                   child: Padding(
@@ -77,16 +82,16 @@ class ChallengeScreen extends StatelessWidget {
                           child: Column(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16 * (isTablet ? 1.2 : 1), vertical: 8 * (isTablet ? 1.2 : 1)),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.8),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: Text(
                                   l10n.challengeDefaultSectionTitle,
-                                  style: const TextStyle(
-                                    fontSize: 18,
+                                  style: TextStyle(
+                                    fontSize: isTablet ? 30 : 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -113,8 +118,16 @@ class ChallengeScreen extends StatelessWidget {
                                               }
                                             },
                                             child: ListTile(
-                                              title: Text(_quizSetTitle(l10n, set)),
-                                              trailing: isLocked ? const Icon(Icons.lock, color: Colors.grey) : null,
+                                              dense: !isTablet,
+                                              contentPadding: isTablet ? const EdgeInsets.symmetric(horizontal: 24, vertical: 8) : const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                                              title: Text(
+                                                _quizSetTitle(l10n, set),
+                                                style: TextStyle(
+                                                  fontSize: isTablet ? 30 : 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              trailing: isLocked ? Icon(Icons.lock, color: Colors.grey, size: 24 * (isTablet ? 1.5 : 1.0)) : null,
                                             ),
                                           );
                                         },
@@ -131,16 +144,16 @@ class ChallengeScreen extends StatelessWidget {
                           child: Column(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16 * (isTablet ? 1.2 : 1), vertical: 8 * (isTablet ? 1.2 : 1)),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.8),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: Text(
                                   l10n.challengeCustomSectionTitle,
-                                  style: const TextStyle(
-                                    fontSize: 18,
+                                  style: TextStyle(
+                                    fontSize: isTablet ? 30 : 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -158,6 +171,7 @@ class ChallengeScreen extends StatelessWidget {
                                             l10n.customListEmpty,
                                             style: TextStyle(
                                               color: Colors.black,
+                                              fontSize: 18 * (isTablet ? 1.5 : 1.0),
                                               fontWeight: FontWeight.bold,
                                               shadows: [
                                                 Shadow(
@@ -186,15 +200,21 @@ class ChallengeScreen extends StatelessWidget {
                                               );
                                             },
                                             child: ListTile(
+                                              dense: !isTablet,
+                                              contentPadding: isTablet ? const EdgeInsets.symmetric(horizontal: 24, vertical: 8) : const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                                               title: Row(
                                                 children: [
                                                   Expanded(
                                                     child: Text(
                                                       _quizSetTitle(l10n, set),
+                                                      style: TextStyle(
+                                                        fontSize: isTablet ? 30 : 18,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
                                                     ),
                                                   ),
                                                   if (isNew)
-                                                    const _NewBadge(),
+                                                     _NewBadge(fontScale: isTablet ? 1.5 : 1.0),
                                                 ],
                                               ),
                                             ),
@@ -208,7 +228,7 @@ class ChallengeScreen extends StatelessWidget {
                                           child: IconButton(
                                             icon: const Icon(Icons.add_circle),
                                             color: Colors.green.shade800,
-                                            iconSize: 48 * scale,
+                                            iconSize: 48 * scale * (isTablet ? 1.2 : 1.0),
                                             onPressed: () {
                                               if (!appState.isFullVersionPurchased) {
                                                 PremiumPromotionDialog.show(context, appState);
@@ -231,7 +251,7 @@ class ChallengeScreen extends StatelessWidget {
                                         child: Text(
                                           l10n.challengeMoreButton,
                                           style: TextStyle(
-                                            fontSize: 18 * scale,
+                                            fontSize: isTablet ? 30 : 18,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -281,23 +301,24 @@ class ChallengeScreen extends StatelessWidget {
 }
 
 class _NewBadge extends StatelessWidget {
-  const _NewBadge();
+  final double fontScale;
+  const _NewBadge({this.fontScale = 1.0});
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: EdgeInsets.symmetric(horizontal: 8 * fontScale, vertical: 2 * fontScale),
       decoration: BoxDecoration(
         color: PuniButtonColors.pink,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12 * fontScale),
       ),
       child: Text(
         l10n.badgeNewLabel,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
-          fontSize: 12,
+          fontSize: 14 * fontScale,
         ),
       ),
     );

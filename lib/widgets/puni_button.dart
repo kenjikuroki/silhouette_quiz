@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import '../services/audio_service.dart';
 
 class PuniButtonColors {
-  static const Color pink = Color(0xFFFF7DA0);
-  static const Color green = Color(0xFF61C178);
-  static const Color blueGrey = Color(0xFF6F7FA8);
+  static const Color pink = Color(0xFFE91E63);
+  static const Color green = Color(0xFF388E3C);
+  static const Color blueGrey = Color(0xFF455A64);
 }
 
 class PuniButton extends StatelessWidget {
@@ -44,7 +44,7 @@ class PuniButton extends StatelessWidget {
             maxLines: 1,
             style: TextStyle(
               color: textColor,
-              fontSize: 16,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),

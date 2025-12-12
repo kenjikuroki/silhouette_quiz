@@ -70,26 +70,38 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
+  TextStyle? _applyMinFontSize(TextStyle? style, double minSize) {
+    if (style == null) return null;
+    final currentSize = style.fontSize ?? 14.0;
+    return style.copyWith(
+      fontSize: currentSize < minSize ? minSize : currentSize,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Define base text theme with M PLUS Rounded 1c w800 (ExtraBold) as requested
     final baseTextTheme = GoogleFonts.mPlusRounded1cTextTheme(Theme.of(context).textTheme);
+    
+    // Helper to ensure min 18pt
+    TextStyle? applyMin(TextStyle? style) => _applyMinFontSize(style, 22.0);
+
     final mediumTextTheme = baseTextTheme.copyWith(
-      displayLarge: baseTextTheme.displayLarge?.copyWith(fontWeight: FontWeight.w800),
-      displayMedium: baseTextTheme.displayMedium?.copyWith(fontWeight: FontWeight.w800),
-      displaySmall: baseTextTheme.displaySmall?.copyWith(fontWeight: FontWeight.w800),
-      headlineLarge: baseTextTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w800),
-      headlineMedium: baseTextTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
-      headlineSmall: baseTextTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-      titleLarge: baseTextTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-      titleMedium: baseTextTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-      titleSmall: baseTextTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-      bodyLarge: baseTextTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w800),
-      bodyMedium: baseTextTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w800),
-      bodySmall: baseTextTheme.bodySmall?.copyWith(fontWeight: FontWeight.w800),
-      labelLarge: baseTextTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800),
-      labelMedium: baseTextTheme.labelMedium?.copyWith(fontWeight: FontWeight.w800),
-      labelSmall: baseTextTheme.labelSmall?.copyWith(fontWeight: FontWeight.w800),
+      displayLarge: applyMin(baseTextTheme.displayLarge?.copyWith(fontWeight: FontWeight.w700)),
+      displayMedium: applyMin(baseTextTheme.displayMedium?.copyWith(fontWeight: FontWeight.w700)),
+      displaySmall: applyMin(baseTextTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700)),
+      headlineLarge: applyMin(baseTextTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w700)),
+      headlineMedium: applyMin(baseTextTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700)),
+      headlineSmall: applyMin(baseTextTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
+      titleLarge: applyMin(baseTextTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+      titleMedium: applyMin(baseTextTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+      titleSmall: applyMin(baseTextTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+      bodyLarge: applyMin(baseTextTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700)),
+      bodyMedium: applyMin(baseTextTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+      bodySmall: applyMin(baseTextTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+      labelLarge: applyMin(baseTextTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
+      labelMedium: applyMin(baseTextTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700)),
+      labelSmall: applyMin(baseTextTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700)),
     );
 
     return AnimatedBuilder(

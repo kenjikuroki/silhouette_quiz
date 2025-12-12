@@ -51,88 +51,95 @@ class PremiumPromotionDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final double w = MediaQuery.of(context).size.width;
+    // Revert scaling for Premium Dialog as requested by user.
+    final double fontScale = 1.0;
+
     return FactoryDialog(
       title: l10n.premiumPromotionTitle,
-      titleFontSize: 18,
+      titleFontSize: 16 * fontScale,
       message: '', // Custom content used below
       forceAspectRatio: false, // Auto height
       borderColor: const Color(0xFFFFD700), // Gold/Yellow for Premium
-      backgroundAsset: null,
+      backgroundAsset: null, // Set to white as requested
       useSparkle: true,
       actions: [
-        _buildContent(context, l10n),
+        _buildContent(context, l10n, fontScale),
       ],
     );
   }
 
-  Widget _buildContent(BuildContext context, AppLocalizations l10n) {
-    
+  Widget _buildContent(BuildContext context, AppLocalizations l10n, double fontScale) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           l10n.premiumPromotionMessage,
           textAlign: TextAlign.left,
-          style: const TextStyle(
-            fontSize: 14,
+          style: TextStyle(
+            fontSize: 15 * fontScale,
             height: 1.5,
             color: Colors.black87,
           ),
         ),
-        const SizedBox(height: 24),
-        PuniButton(
-          child: Text(
-            l10n.premiumPromotionBuyButton,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+        SizedBox(height: 24 * fontScale),
+        SizedBox(
+          width: 450 * fontScale,
+          child: PuniButton(
+            child: Text(
+              l10n.premiumPromotionBuyButton,
+              style: TextStyle(
+                fontSize: 16 * fontScale,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
-          ),
-          color: PuniButtonColors.pink,
-          onPressed: () async {
-            // Parental Gate
-            final bool authorized = await ParentalGateDialog.show(context);
-            if (!authorized || !context.mounted) return;
+            color: PuniButtonColors.pink,
+            height: 48 * fontScale,
+            onPressed: () async {
+              // Parental Gate
+              final bool authorized = await ParentalGateDialog.show(context);
+              if (!authorized || !context.mounted) return;
 
-            // Call purchase
-            final success = await appState.purchaseService.purchaseFullVersion();
-            if (context.mounted) {
-              Navigator.of(context).pop(success); // Close dialog with result
-              if (success) {
-                  appState.notifyListeners(); // Ensure UI updates
+              // Call purchase
+              final success = await appState.purchaseService.purchaseFullVersion();
+              if (context.mounted) {
+                Navigator.of(context).pop(success); // Close dialog with result
+                if (success) {
+                    appState.notifyListeners(); // Ensure UI updates
+                }
               }
-            }
-          },
+            },
+          ),
         ),
-        const SizedBox(height: 12),
-        PuniButton(
-           child: Text(
-             l10n.commonCancel,
-             style: const TextStyle(
-               fontSize: 14,
-               fontWeight: FontWeight.bold,
-               color: Colors.white,
+        SizedBox(height: 12 * fontScale),
+        SizedBox(
+          width: 450 * fontScale,
+          child: PuniButton(
+             child: Text(
+               l10n.commonCancel,
+               style: TextStyle(
+                 fontSize: 16 * fontScale,
+                 fontWeight: FontWeight.bold,
+                 color: Colors.white,
+               ),
              ),
-           ),
-           color: PuniButtonColors.blueGrey,
-           onPressed: () => Navigator.of(context).pop(),
+             color: PuniButtonColors.blueGrey,
+             height: 48 * fontScale,
+             onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
         TextButton(
           onPressed: () async {
             await appState.purchaseService.restorePurchases();
-            // Restore handling is done via stream listener in PurchaseService.
-            // If successful, it updates the state.
-            // We might want to close the dialog or show a message, but the service handles it.
-            // For now, just call the method.
             if (context.mounted) {
                Navigator.of(context).pop();
             }
           },
           child: Text(
             l10n.premiumRestoreButton,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            style: TextStyle(fontSize: 13 * fontScale, color: Colors.grey),
           ),
         ),
       ],

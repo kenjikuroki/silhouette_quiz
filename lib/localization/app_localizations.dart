@@ -48,13 +48,13 @@ class AppLocalizations {
 
       // Custom list
       'custom_list_title': 'つくったクイズ',
-      'custom_list_empty': 'まだ じぶんのクイズは ありません',
+      'custom_list_empty': 'まだ じぶんの クイズは\nありません',
       'custom_list_quiz_count': '{count} もん',
 
       // Create flow
       'create_intro_title': 'クイズをつくろう',
       'create_intro_message':
-          'しゃしんをとって じぶんだけの シルエットクイズを つくろう！\nさいだい 5まい まで とれるよ。',
+          'しゃしんをとって じぶんだけの\nシルエットクイズを つくろう！\nさいだい 5まい まで とれるよ。',
       'create_intro_start_button': 'はじめる',
       'create_capture_title': 'しゃしんをとる',
       'create_capture_add_dummy': 'しゃしんを 1まい とる',
@@ -86,7 +86,7 @@ class AppLocalizations {
       'play_quiz_correct': 'あってた！',
       'play_quiz_incorrect': 'ちがった',
       'play_quiz_result_title': 'けっか',
-      'play_quiz_result_message': '{total}もん ちゅう {correct}もん せいかい！',
+      'play_quiz_result_message': '{correct}もん せいかい！',
       'play_quiz_not_found': 'クイズが みつかりません',
       'play_quiz_placeholder_title': 'シルエット {number}',
       'play_quiz_celebration_title': 'がんばったね！',
@@ -94,7 +94,7 @@ class AppLocalizations {
       // Delete
       'delete_quiz_confirm_title': 'このクイズを けす？',
       'delete_quiz_confirm_message':
-          'このクイズに ふくまれる もんだい は\nすべて けされます。',
+          'このクイズに ふくまれる\nもんだいは\nすべて けされます。',
       'common_delete': 'けす',
       'common_cancel': 'やめる',
 
@@ -153,13 +153,13 @@ class AppLocalizations {
 
       // Custom list
       'custom_list_title': 'Your quizzes',
-      'custom_list_empty': 'No custom quizzes yet',
+      'custom_list_empty': 'No custom\nquizzes yet',
       'custom_list_quiz_count': '{count} questions',
 
       // Create flow
       'create_intro_title': "Let's make a quiz",
       'create_intro_message':
-          'Take photos to make your own silhouette quiz!\nYou can take up to 5 pictures.',
+          'Take photos to make your own\nsilhouette quiz!\nYou can take up to 5 pictures.',
       'create_intro_start_button': 'Start',
       'create_capture_title': 'Take a photo',
       'create_capture_add_dummy': 'Take one photo',
@@ -191,7 +191,7 @@ class AppLocalizations {
       'play_quiz_correct': 'Got it!',
       'play_quiz_incorrect': 'Not yet',
       'play_quiz_result_title': 'Results',
-      'play_quiz_result_message': 'You got {correct} of {total} right!',
+      'play_quiz_result_message': '{correct} Correct!',
       'play_quiz_not_found': 'Quiz not found',
       'play_quiz_placeholder_title': 'Silhouette {number}',
       'play_quiz_celebration_title': 'Great job!',
@@ -199,7 +199,7 @@ class AppLocalizations {
       // Delete
       'delete_quiz_confirm_title': 'Delete this quiz?',
       'delete_quiz_confirm_message':
-          'All of the questions inside this quiz will be deleted.',
+          'All of the questions\ninside this quiz\nwill be deleted.',
       'common_delete': 'Delete',
       'common_cancel': 'Cancel',
 
@@ -260,13 +260,13 @@ class AppLocalizations {
 
       // Custom list
       'custom_list_title': 'Tus quizzes',
-      'custom_list_empty': 'Todavía no hay quizzes propios',
+      'custom_list_empty': 'Todavía no hay\nquizzes propios',
       'custom_list_quiz_count': '{count} preguntas',
 
       // Create flow
       'create_intro_title': 'Vamos a crear un quiz',
       'create_intro_message':
-          'Toma fotos para hacer tu propio quiz de siluetas.\nPuedes tomar hasta 5 fotos.',
+          'Toma fotos para hacer tu propio\nquiz de siluetas.\nPuedes tomar hasta 5 fotos.',
       'create_intro_start_button': 'Empezar',
       'create_capture_title': 'Tomar foto',
       'create_capture_add_dummy': 'Tomar una foto',
@@ -298,7 +298,7 @@ class AppLocalizations {
       'play_quiz_correct': '¡Lo logré!',
       'play_quiz_incorrect': 'Aún no',
       'play_quiz_result_title': 'Resultados',
-      'play_quiz_result_message': '¡Acertaste {correct} de {total}!',
+      'play_quiz_result_message': '¡{correct} Correctas!',
       'play_quiz_not_found': 'No se encontró el quiz',
       'play_quiz_placeholder_title': 'Silueta {number}',
       'play_quiz_celebration_title': '¡Buen trabajo!',
@@ -306,7 +306,7 @@ class AppLocalizations {
       // Delete
       'delete_quiz_confirm_title': '¿Borrar este quiz?',
       'delete_quiz_confirm_message':
-          'Todas las preguntas de este quiz se borrarán.',
+          'Todas las preguntas\nde este quiz\nse borrarán.',
       'common_delete': 'Borrar',
       'common_cancel': 'Cancelar',
 

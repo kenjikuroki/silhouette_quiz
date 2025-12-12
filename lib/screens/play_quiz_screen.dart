@@ -189,6 +189,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
+          final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
           final double w = constraints.maxWidth;
           final double h = constraints.maxHeight;
           const double designWidth = 1024;
@@ -247,13 +248,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                     ),
                     child: Column(
                       children: [
-                        Text(
-                          '${_currentIndex + 1} / ${_questions.length}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
+
                         Expanded(
                           child: OverflowBox(
                             maxWidth: MediaQuery.of(context).size.width,
@@ -312,7 +307,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                       ), // Expanded
                         const SizedBox(height: 16),
                         SizedBox(
-                          height: 60,
+                          height: isTablet ? 100 : 60,
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 400),
                             transitionBuilder:
@@ -328,12 +323,11 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                         key: ValueKey<int>(
                                             _currentIndex),
                                         child: ConstrainedBox(
-                                          constraints: const BoxConstraints(
-                                              maxWidth: 220),
+                                          constraints: BoxConstraints(
+                                              maxWidth: 220 * (isTablet ? 1.5 : 1.0)),
                                           child: PuniButton(
-                                            text: l10n.playQuizShowAnswer,
                                             color: PuniButtonColors.green,
-                                            height: 44,
+                                            height: isTablet ? 68 : 48,
                                             onPressed: () {
                                               setState(() {
                                                 _revealedIndices
@@ -342,6 +336,14 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                                     _currentIndex);
                                               });
                                             },
+                                            child: Text(
+                                              l10n.playQuizShowAnswer,
+                                              style: TextStyle(
+                                                fontSize: isTablet ? 30 : 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       )
@@ -358,9 +360,8 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                               const EdgeInsets.symmetric(
                                                   horizontal: 16.0),
                                           child: PuniButton(
-                                            text: l10n.playQuizIncorrect,
                                             color: PuniButtonColors.blueGrey,
-                                            height: 44,
+                                            height: isTablet ? 68 : 48,
                                             playSound: false,
                                             onPressed: hasCurrentAnswered
                                                 ? null
@@ -372,6 +373,14 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                                       isCorrect: false,
                                                     );
                                                   },
+                                            child: Text(
+                                              l10n.playQuizIncorrect,
+                                              style: TextStyle(
+                                                fontSize: isTablet ? 30 : 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -381,9 +390,8 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                               const EdgeInsets.symmetric(
                                                   horizontal: 16.0),
                                           child: PuniButton(
-                                            text: l10n.playQuizCorrect,
                                             color: PuniButtonColors.pink,
-                                            height: 44,
+                                            height: isTablet ? 68 : 48,
                                             playSound: false,
                                             onPressed: hasCurrentAnswered
                                                 ? null
@@ -395,6 +403,14 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                                       isCorrect: true,
                                                     );
                                                   },
+                                            child: Text(
+                                              l10n.playQuizCorrect,
+                                              style: TextStyle(
+                                                fontSize: isTablet ? 30 : 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -402,15 +418,15 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 16), // Adjusted to lower buttons
+                        SizedBox(height: 16 * (isTablet ? 2.5 : 1.0)), // Adjusted to raise buttons on iPad
                       ],
                     ),
                   ),
                 ),
                 // Independent Answer Text Overlay
                 Positioned(
-                  top: 80, // Moved up from 100
-                  left: 24,
+                  top: isTablet ? 120 : 80, // iPad: lower
+                  left: isTablet ? 60 : 24, // iPad: more right
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
                     child: currentAnswerRevealed
@@ -447,10 +463,14 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     final List<String> parts = text.split('|');
     final String localeCode = Localizations.localeOf(context).languageCode;
 
+    final double w = MediaQuery.of(context).size.width;
+    final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    final double scale = isTablet ? 1.5 : 1.0;
+
     Text _large(String value) => Text(
           value,
-          style: const TextStyle(
-            fontSize: 48,
+          style: TextStyle(
+            fontSize: 48 * scale,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
@@ -459,8 +479,8 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
 
     Text _small(String value) => Text(
           value,
-          style: const TextStyle(
-            fontSize: 18,
+          style: TextStyle(
+            fontSize: 22 * scale,
             fontWeight: FontWeight.bold,
             color: Colors.black54,
           ),
@@ -599,12 +619,17 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
     BuildContext context, {
     required bool isCorrect,
   }) async {
+    // Prevent double counting
+    if (_answeredIndices.contains(_currentIndex)) return;
+
     // 正解数カウント
     if (isCorrect) {
       _correctCount++;
     }
 
     _answeredIndices.add(_currentIndex);
+    // Update UI immediately to disable buttons
+    setState(() {});
 
     // 次へ進む判定
     final bool isLast = _currentIndex == _questions.length - 1;
@@ -651,7 +676,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
           backgroundAsset: 'assets/images/character/result.png',
           borderColor: const Color(0xFFE49A00),
           celebrationTitle: l10n.playQuizCelebrationTitle,
-          celebrationFontSize: 20,
+          celebrationFontSize: 24,
           useCelebrationOutline: true,
           icon: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -670,12 +695,12 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                     const Icon(
                       Icons.star,
                       color: Colors.black,
-                      size: 54,
+                      size: 46,
                     ),
                     Icon(
                       filled ? fillIcon : outlineIcon,
                       color: fillColor,
-                      size: 34,
+                      size: 28,
                     ),
                   ],
                 ),
@@ -688,6 +713,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
               child: PuniButton(
                 text: l10n.commonOk,
                 color: PuniButtonColors.pink,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 onPressed: () {
                   Navigator.of(dialogContext).pop();
                   Navigator.of(context).pop();
