@@ -294,6 +294,10 @@ class ChallengeScreen extends StatelessWidget {
         return l10n.quizSetKitchenItems;
       case 'school_supplies_1':
         return l10n.quizSetStationery;
+      case 'sports_1':
+        return l10n.quizSetSports;
+      case 'instruments_1':
+        return l10n.quizSetInstruments;
       default:
         return set.title;
     }

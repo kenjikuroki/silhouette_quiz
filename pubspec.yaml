@@ -56,6 +56,8 @@ flutter:
     - assets/images/quiz/kitchen/
     - assets/images/quiz/school_supplies/
     - assets/images/quiz/vehicle/
+    - assets/images/quiz/sports/
+    - assets/images/quiz/Instruments/
     - assets/images/character/
     - assets/images/icon/cat_icon.png
     - assets/images/icon/cat_icon_r.png

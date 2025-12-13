@@ -404,6 +404,126 @@ class QuizAppState extends ChangeNotifier {
           ),
         ],
       ),
+
+      // 7. Sports (New)
+      QuizSet(
+        id: 'sports_1',
+        title: 'すぽーつ',
+        isCustom: false,
+        questions: [
+          QuizQuestion(
+            id: 'sports_baseball',
+            silhouetteImagePath: 'assets/images/quiz/sports/baseball_b.png',
+            originalImagePath: 'assets/images/quiz/sports/baseball.png',
+            answerText: 'やきゅう|べーすぼーる|baseball|béisbol',
+          ),
+          QuizQuestion(
+            id: 'sports_bowling',
+            silhouetteImagePath: 'assets/images/quiz/sports/boring_b.png',
+            originalImagePath: 'assets/images/quiz/sports/boring.png',
+            answerText: 'ぼうりんぐ|ぼうりんぐ|bowling|bolos',
+          ),
+          QuizQuestion(
+            id: 'sports_boxing',
+            silhouetteImagePath: 'assets/images/quiz/sports/boxing_b.png',
+            originalImagePath: 'assets/images/quiz/sports/boxing.png',
+            answerText: 'ぼくしんぐ|ぼくしんぐ|boxing|boxeo',
+          ),
+          QuizQuestion(
+            id: 'sports_golf',
+            silhouetteImagePath: 'assets/images/quiz/sports/golf_b.png',
+            originalImagePath: 'assets/images/quiz/sports/golf.png',
+            answerText: 'ごるふ|ごるふ|golf|golf',
+          ),
+          QuizQuestion(
+            id: 'sports_pingpong',
+            silhouetteImagePath: 'assets/images/quiz/sports/pingpong_b.png',
+            originalImagePath: 'assets/images/quiz/sports/pingpong.png',
+            answerText: 'たっきゅう|ぴんぽん|ping pong|tenis de mesa',
+          ),
+          QuizQuestion(
+            id: 'sports_soccer',
+            silhouetteImagePath: 'assets/images/quiz/sports/soccer_b.png',
+            originalImagePath: 'assets/images/quiz/sports/soccer.png',
+            answerText: 'さっかー|さっかー|soccer|fútbol',
+          ),
+          QuizQuestion(
+            id: 'sports_tennis',
+            silhouetteImagePath: 'assets/images/quiz/sports/tennis_b.png',
+            originalImagePath: 'assets/images/quiz/sports/tennis.png',
+            answerText: 'てにす|てにす|tennis|tenis',
+          ),
+        ],
+      ),
+
+      // 8. Instruments (New)
+      QuizSet(
+        id: 'instruments_1',
+        title: 'がっき',
+        isCustom: false,
+        questions: [
+          QuizQuestion(
+            id: 'instruments_castanets',
+            silhouetteImagePath: 'assets/images/quiz/Instruments/Castanets_b.png',
+            originalImagePath: 'assets/images/quiz/Instruments/Castanets.png',
+            answerText: 'かすたねっと|かすたねっと|castanets|castañuelas',
+          ),
+          QuizQuestion(
+            id: 'instruments_drum',
+            silhouetteImagePath: 'assets/images/quiz/Instruments/Drum_b.png',
+            originalImagePath: 'assets/images/quiz/Instruments/Drum.png',
+            answerText: 'たいこ|どらむ|drum|tambor',
+          ),
+          QuizQuestion(
+            id: 'instruments_maracas',
+            silhouetteImagePath: 'assets/images/quiz/Instruments/Maracas_b.png',
+            originalImagePath: 'assets/images/quiz/Instruments/Maracas.png',
+            answerText: 'まらかす|まらかす|maracas|maracas',
+          ),
+          QuizQuestion(
+            id: 'instruments_sax',
+            silhouetteImagePath: 'assets/images/quiz/Instruments/SAX_b.png',
+            originalImagePath: 'assets/images/quiz/Instruments/SAX.png',
+            answerText: 'さっくす|さっくす|saxophone|saxofón',
+          ),
+          QuizQuestion(
+            id: 'instruments_tambourine',
+            silhouetteImagePath: 'assets/images/quiz/Instruments/Tambourine_b.png',
+            originalImagePath: 'assets/images/quiz/Instruments/Tambourine.png',
+            answerText: 'たんばりん|たんばりん|tambourine|pandereta',
+          ),
+          QuizQuestion(
+            id: 'instruments_trumpet',
+            silhouetteImagePath: 'assets/images/quiz/Instruments/Trumpet_b.png',
+            originalImagePath: 'assets/images/quiz/Instruments/Trumpet.png',
+            answerText: 'とらんぺっと|とらんぺっと|trumpet|trompeta',
+          ),
+          QuizQuestion(
+            id: 'instruments_xylophone',
+            silhouetteImagePath: 'assets/images/quiz/Instruments/Xylophone_b.png',
+            originalImagePath: 'assets/images/quiz/Instruments/Xylophone.png',
+            answerText: 'もっきん|ざいろふぉん|xylophone|xilófono',
+          ),
+          QuizQuestion(
+            id: 'instruments_guitar',
+            silhouetteImagePath: 'assets/images/quiz/Instruments/guitar_b.png',
+            originalImagePath: 'assets/images/quiz/Instruments/guitar.png',
+            answerText: 'ぎたー|ぎたー|guitar|guitarra',
+          ),
+          QuizQuestion(
+            id: 'instruments_piano',
+            silhouetteImagePath: 'assets/images/quiz/Instruments/piano_b.png',
+            originalImagePath: 'assets/images/quiz/Instruments/piano.png',
+            answerText: 'ぴあの|ぴあの|piano|piano',
+          ),
+          QuizQuestion(
+            id: 'instruments_violin',
+            silhouetteImagePath: 'assets/images/quiz/Instruments/violin_b.png',
+            originalImagePath: 'assets/images/quiz/Instruments/violin.png',
+            answerText: 'ばいおりん|ばいおりん|violin|violín',
+          ),
+        ],
+      ),
     ]);
   }
 

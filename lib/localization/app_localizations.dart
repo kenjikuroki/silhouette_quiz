@@ -45,6 +45,8 @@ class AppLocalizations {
       'quiz_set_home_items': 'いえにあるもの',
       'quiz_set_kitchen_items': 'だいどころにあるもの',
       'quiz_set_stationery': 'ぶんぼうぐ',
+      'quiz_set_sports': 'すぽーつ',
+      'quiz_set_instruments': 'がっき',
 
       // Custom list
       'custom_list_title': 'つくったクイズ',
@@ -107,7 +109,7 @@ class AppLocalizations {
 
       // Premium Promotion
       'premium_promotion_title': 'プレミアム版のお知らせ',
-      'premium_promotion_message': '・ロック中の3つのカテゴリであそべるようになります。\n・自分で作れるクイズリストを3つ以上作成できます。\n・一度の購入で、ずっと使えます。',
+      'premium_promotion_message': '・ロック中の5つのカテゴリであそべるようになります。\n・自分で作れるクイズリストを3つ以上作成できます。\n・一度の購入で、ずっと使えます。',
       'premium_promotion_buy_button': '300円でプレミアム版を購入',
       'premium_restore_button': '購入を復元する',
       'purchase_complete_title': 'ありがとう！',
@@ -150,6 +152,8 @@ class AppLocalizations {
       'quiz_set_home_items': 'Things at home',
       'quiz_set_kitchen_items': 'Kitchen tools',
       'quiz_set_stationery': 'School supplies',
+      'quiz_set_sports': 'Sports',
+      'quiz_set_instruments': 'Instruments',
 
       // Custom list
       'custom_list_title': 'Your quizzes',
@@ -213,7 +217,7 @@ class AppLocalizations {
       // Premium Promotion
       'premium_promotion_title': 'About Premium',
       'premium_promotion_message':
-          '- Play with the 3 locked categories.\n- Create more than 3 custom quiz lists.\n- One purchase lasts forever.',
+          '- Play with the 5 locked categories.\n- Create more than 3 custom quiz lists.\n- One purchase lasts forever.',
       'premium_promotion_buy_button': 'Buy Premium',
       'premium_restore_button': 'Restore purchase',
       'purchase_complete_title': 'Thank you!',
@@ -257,6 +261,8 @@ class AppLocalizations {
       'quiz_set_home_items': 'En casa',
       'quiz_set_kitchen_items': 'Cocina',
       'quiz_set_stationery': 'Útiles',
+      'quiz_set_sports': 'Deportes',
+      'quiz_set_instruments': 'Instrumentos',
 
       // Custom list
       'custom_list_title': 'Tus quizzes',
@@ -320,7 +326,7 @@ class AppLocalizations {
       // Premium Promotion
       'premium_promotion_title': 'Sobre Premium',
       'premium_promotion_message':
-          '- Juega en las 3 categorías bloqueadas.\n- Crea más de 3 listas propias.\n- Con una compra lo usas siempre.',
+          '- Juega en las 5 categorías bloqueadas.\n- Crea más de 3 listas propias.\n- Con una compra lo usas siempre.',
       'premium_promotion_buy_button': 'Comprar Premium',
       'premium_restore_button': 'Restaurar compra',
       'purchase_complete_title': '¡Gracias!',
@@ -370,6 +376,8 @@ class AppLocalizations {
   String get quizSetHomeItems => _translate('quiz_set_home_items');
   String get quizSetKitchenItems => _translate('quiz_set_kitchen_items');
   String get quizSetStationery => _translate('quiz_set_stationery');
+  String get quizSetSports => _translate('quiz_set_sports');
+  String get quizSetInstruments => _translate('quiz_set_instruments');
 
   String get customListTitle => _translate('custom_list_title');
   String get customListEmpty => _translate('custom_list_empty');
