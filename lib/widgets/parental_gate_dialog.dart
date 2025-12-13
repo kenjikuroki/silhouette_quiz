@@ -41,9 +41,14 @@ class _ParentalGateDialogState extends State<ParentalGateDialog> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final size = MediaQuery.of(context).size;
+      // 600 is a common breakpoint. iPad Mini is > 700.
       _isTablet = size.shortestSide >= 600;
+
       if (!_isTablet) {
         // Force Portrait for phones
+        // 1. Reset preferences to clear any locks
+        await SystemChrome.setPreferredOrientations([]); 
+        // 2. Then explicitly strict to Portrait
         await SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
           DeviceOrientation.portraitDown,
@@ -54,15 +59,13 @@ class _ParentalGateDialogState extends State<ParentalGateDialog> {
 
   @override
   void dispose() {
-    // Revert to Landscape if we changed it (Phones)
-    // We can't rely on _isTablet being perfectly stable if context died, 
-    // but usually it is fine. To be safe, always restore landscape on dispose
-    // if we are on a device that *might* have rotated.
-    // Or just always restore for this app's requirement.
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    // Restore Landscape when closing dialog (only if we might have changed it)
+    if (!_isTablet) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
     super.dispose();
   }
 

@@ -4,7 +4,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 
 class PurchaseService extends ChangeNotifier {
   // ストアで設定したプロダクトID (iOS/Android共通の場合)
-  static const String _productID = 'com.yourapp.silhouette_quiz.premium';
+  static const String _productID = 'premium_unlock';
 
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   late StreamSubscription<List<PurchaseDetails>> _subscription;
