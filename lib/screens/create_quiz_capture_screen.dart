@@ -154,9 +154,9 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                 ),
               // Capture Button
               Positioned(
-                right: horizontalOffset + 240 * scale,
+                right: horizontalOffset + (isTablet ? 100 * scale : 240 * scale),
                 bottom: verticalOffset + 430 * scale,
-                width: isTablet ? 180 * scale * 1.2 : 240 * scale,
+                width: isTablet ? 280 * scale * 1.2 : 340 * scale,
               child: PuniButton(
                   text: l10n.createCaptureTitle,
                   color: PuniButtonColors.green,
@@ -172,9 +172,9 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
               ),
               // Finish Button
               Positioned(
-                right: horizontalOffset + 240 * scale,
+                right: horizontalOffset + (isTablet ? 100 * scale : 240 * scale),
                 bottom: verticalOffset + 340 * scale,
-                width: isTablet ? 180 * scale * 1.2 : 240 * scale,
+                width: isTablet ? 280 * scale * 1.2 : 340 * scale,
                 child: PuniButton(
                   text: l10n.createCaptureFinish,
                   color: PuniButtonColors.pink,
@@ -205,11 +205,13 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
   }
 
   Future<void> _captureImageFromCamera() async {
+    final AppLocalizations l10n = AppLocalizations.of(context);
     const bool isTestMode = bool.fromEnvironment('TEST_MODE');
     String originalPath;
 
+    debugPrint('Starting capture process...');
+
     if (isTestMode) {
-      // Test Mode: Simulate capture using an asset
       try {
         final ByteData byteData = await rootBundle.load('assets/images/quiz/animal/cat.png');
         final Directory tempDir = await getTemporaryDirectory();
@@ -217,50 +219,56 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
         await tempFile.writeAsBytes(byteData.buffer.asUint8List(), flush: true);
         originalPath = tempFile.path;
       } catch (e) {
-        // Fallback or error handling for test mode
         debugPrint('Test Mode Error: $e');
         return;
       }
     } else {
-      // Normal Mode: Camera
-      final XFile? picked = await _picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1024,
-        maxHeight: 1024,
-      );
+      try {
+        final XFile? picked = await _picker.pickImage(
+          source: ImageSource.camera,
+          maxWidth: 1024,
+          maxHeight: 1024,
+        );
 
-      if (picked == null) {
-        // Cancelled
+        if (picked == null) {
+          debugPrint('User cancelled capture');
+          return;
+        }
+        originalPath = picked.path;
+        debugPrint('Image captured successfully: $originalPath');
+      } catch (e) {
+        debugPrint('Camera Error: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Camera Error: $e')),
+          );
+        }
         return;
       }
-      originalPath = picked.path;
     }
 
     String silhouettePath;
     try {
+      debugPrint('Starting silhouette creation for: $originalPath');
       if (isTestMode) {
-        // Test Mode: Bypass ML Kit (which may crash on Simulator)
-        // Just copy original to silhouette path
          silhouettePath = originalPath.replaceAll(
           RegExp(r'\.(png|jpg|jpeg)$', caseSensitive: false),
           '_silhouette.png',
         );
-        // If they are same (no extension change), append suffix
         if (silhouettePath == originalPath) {
           silhouettePath = '$originalPath.silhouette.png';
         }
         await File(originalPath).copy(silhouettePath);
       } else {
-        // Normal Mode: Generate Silhouette using ML Kit
         silhouettePath =
             await appState.silhouetteService.createSilhouette(originalPath);
       }
+      debugPrint('Silhouette created: $silhouettePath');
     } catch (e) {
       debugPrint('Error creating silhouette: $e');
       if (mounted) {
-        final AppLocalizations l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.createCaptureErrorMessage('$e'))),
+          SnackBar(content: Text('ML Kit Error: $e')),
         );
       }
       return;

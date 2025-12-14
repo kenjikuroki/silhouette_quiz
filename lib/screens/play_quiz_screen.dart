@@ -358,7 +358,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                         child: Padding(
                                           padding:
                                               const EdgeInsets.symmetric(
-                                                  horizontal: 16.0),
+                                                  horizontal: 8.0),
                                           child: PuniButton(
                                             color: PuniButtonColors.blueGrey,
                                             height: isTablet ? 68 : 48,
@@ -388,7 +388,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                                         child: Padding(
                                           padding:
                                               const EdgeInsets.symmetric(
-                                                  horizontal: 16.0),
+                                                  horizontal: 8.0),
                                           child: PuniButton(
                                             color: PuniButtonColors.pink,
                                             height: isTablet ? 68 : 48,

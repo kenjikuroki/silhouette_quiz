@@ -27,10 +27,9 @@ class AudioService {
     // Configure AudioContext for reliable playback
     final AudioContext audioContext = AudioContext(
       iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.ambient,
+        category: AVAudioSessionCategory.playback,
         options: [
           AVAudioSessionOptions.mixWithOthers,
-          AVAudioSessionOptions.defaultToSpeaker
         ],
       ),
       android: AudioContextAndroid(
