@@ -2,7 +2,7 @@ name: silhouette_quiz
 description: "Silhouette quiz for kids."
 publish_to: 'none'
 
-version: 1.0.6+6
+version: 1.0.10+10
 
 environment:
   sdk: '>=3.9.0 <4.0.0'
@@ -16,7 +16,7 @@ dependencies:
     sdk: flutter
 
   # iOS っぽいアイコン
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^1.0.1
 
   # ★ 追加：カメラ・ギャラリーから画像を取る
   image_picker: ^1.0.7

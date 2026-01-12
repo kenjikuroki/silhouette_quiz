@@ -63,7 +63,7 @@ class AppLocalizations {
       'create_capture_count': 'いま {count} まい',
       'create_capture_item_label': '{number}まいめ',
       'create_capture_finish': 'かんりょう',
-      'create_capture_limit_message': 'これいじょう は とれません（5まい まで）',
+      'create_capture_limit_message': 'これいじょうは とれません\n(５まいまで)',
       'create_capture_error_message': 'エラーが発生しました: {error}',
       'create_capture_no_silhouette': 'シルエットがありません',
       'capture_delete_title': 'このクイズを けす？',

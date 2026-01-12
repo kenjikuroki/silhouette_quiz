@@ -93,7 +93,7 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                           _showPreview(context, question);
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16 * scale, vertical: 16 * scale),
+                          padding: EdgeInsets.symmetric(horizontal: 16 * scale, vertical: 8 * scale),
                           child: Row(
                             children: [
                               Text(
@@ -128,8 +128,8 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
               // Limit Message
               if (_tempQuestions.length >= maxImages)
                 Positioned(
-                  right: horizontalOffset + 240 * scale,
-                  bottom: verticalOffset + 540 * scale,
+                  right: horizontalOffset + (isTablet ? 240 * scale : 180 * scale),
+                  bottom: verticalOffset + (isTablet ? 540 * scale : 420 * scale),
                   width: MediaQuery.of(context).size.shortestSide >= 600 ? 240 * scale : 200 * scale,
                   child: Center(
                     child: DecoratedBox(
@@ -154,9 +154,9 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
                 ),
               // Capture Button
               Positioned(
-                right: horizontalOffset + (isTablet ? 100 * scale : 240 * scale),
-                bottom: verticalOffset + 430 * scale,
-                width: isTablet ? 280 * scale * 1.2 : 340 * scale,
+                right: horizontalOffset + (isTablet ? 100 * scale : 180 * scale),
+                bottom: verticalOffset + (isTablet ? 430 * scale : 290 * scale),
+                width: isTablet ? 280 * scale * 1.2 : 260 * scale,
               child: PuniButton(
                   text: l10n.createCaptureTitle,
                   color: PuniButtonColors.green,
@@ -172,9 +172,9 @@ class _CreateQuizCaptureScreenState extends State<CreateQuizCaptureScreen> {
               ),
               // Finish Button
               Positioned(
-                right: horizontalOffset + (isTablet ? 100 * scale : 240 * scale),
-                bottom: verticalOffset + 340 * scale,
-                width: isTablet ? 280 * scale * 1.2 : 340 * scale,
+                right: horizontalOffset + (isTablet ? 100 * scale : 180 * scale),
+                bottom: verticalOffset + (isTablet ? 340 * scale : 200 * scale),
+                width: isTablet ? 280 * scale * 1.2 : 260 * scale,
                 child: PuniButton(
                   text: l10n.createCaptureFinish,
                   color: PuniButtonColors.pink,

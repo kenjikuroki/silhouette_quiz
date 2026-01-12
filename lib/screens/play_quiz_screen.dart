@@ -425,7 +425,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
                 ),
                 // Independent Answer Text Overlay
                 Positioned(
-                  top: isTablet ? 120 : 80, // iPad: lower
+                  top: isTablet ? 160 : 80, // iPad: lower
                   left: isTablet ? 60 : 24, // iPad: more right
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
@@ -465,7 +465,7 @@ class _PlayQuizScreenState extends State<PlayQuizScreen>
 
     final double w = MediaQuery.of(context).size.width;
     final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
-    final double scale = isTablet ? 1.5 : 1.0;
+    final double scale = isTablet ? 0.8 : 1.0;
 
     Text _large(String value) => Text(
           value,
